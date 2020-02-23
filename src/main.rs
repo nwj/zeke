@@ -6,7 +6,7 @@ use clap::{App, SubCommand};
 fn main() {
     let matches = App::new(crate_name!())
         .version(crate_version!())
-        .about("A tool for managing notes according to the 'Zettelkasten' system")
+        .about(crate_description!())
         .subcommand(SubCommand::with_name("new").about("Create a new note"))
         .get_matches();
 
