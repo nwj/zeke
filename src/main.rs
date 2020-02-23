@@ -2,6 +2,7 @@
 extern crate clap;
 
 use clap::{App, SubCommand};
+use std::process;
 
 fn main() {
     let matches = App::new(crate_name!())
@@ -10,7 +11,8 @@ fn main() {
         .subcommand(SubCommand::with_name("new").about("Create a new note"))
         .get_matches();
 
-    if let Some(_) = matches.subcommand_matches("new") {
-        println!("To be implemented");
+    if let Err(e) = zeke::run(matches) {
+        eprintln!("[{} error] {}", crate_name!(), e);
+        process::exit(1);
     }
 }
