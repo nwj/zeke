@@ -1,14 +1,17 @@
 use clap::ArgMatches;
 use std::error::Error;
 
-pub fn run(matches: ArgMatches) -> Result<(), Box<dyn Error>> {
+mod subcommands;
+
+pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     match matches.subcommand() {
-        ("new", Some(m)) => run_new(m),
+        ("new", Some(m)) => subcommands::new::run(m),
+        ("link", Some(m)) => subcommands::link::run(m),
+        ("unlink", Some(m)) => subcommands::unlink::run(m),
+        ("tag", Some(m)) => subcommands::tag::run(m),
+        ("untag", Some(m)) => subcommands::untag::run(m),
+        ("list", Some(m)) => subcommands::list::run(m),
+        ("backlink", Some(m)) => subcommands::backlink::run(m),
         _ => Ok(()),
     }
-}
-
-fn run_new(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
-    println!("To be implemented.");
-    Ok(())
 }
