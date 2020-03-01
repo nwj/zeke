@@ -1,13 +1,15 @@
 #[macro_use]
 extern crate clap;
 
-use clap::{App, SubCommand};
+use clap::{App, SubCommand, AppSettings};
 use std::process;
 
 fn main() {
     let matches = App::new(crate_name!())
         .version(crate_version!())
         .about(crate_description!())
+        .setting(AppSettings::ArgRequiredElseHelp)
+        .setting(AppSettings::VersionlessSubcommands)
         .subcommand(SubCommand::with_name("new").about("Create a new note"))
         .subcommand(SubCommand::with_name("link").about("Link a note to another note or notes"))
         .subcommand(SubCommand::with_name("unlink").about("Unlink a note from another note or notes"))
