@@ -1,7 +1,7 @@
 [package]
 name = "zeke"
 version = "0.1.0"
-authors = ["Nick Willett-Jeffries <nwillettjeffries@gmail.com>"]
+authors = ["Nick Willett-Jeffries <hello@nwj.cc>"]
 edition = "2018"
 description = "A tool for managing notes using the 'zettelkasten' system"
 
@@ -9,7 +9,10 @@ description = "A tool for managing notes using the 'zettelkasten' system"
 
 [dependencies]
 clap = "~2.33.0"
+chrono = "~0.4.10"
 
 [dev-dependencies]
 assert_cmd = "~0.12.0"
+assert_fs = "~0.13.1"
 predicates = "~1.0.3"
+regex = "~1.3.4"

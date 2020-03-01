@@ -1,5 +1,7 @@
 extern crate assert_cmd;
+extern crate assert_fs;
 extern crate predicates;
+extern crate regex;
 
 use assert_cmd::prelude::*;
 use predicates::prelude::*;

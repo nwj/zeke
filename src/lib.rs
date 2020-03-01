@@ -1,3 +1,5 @@
+extern crate chrono;
+
 use clap::ArgMatches;
 use std::error::Error;
 
