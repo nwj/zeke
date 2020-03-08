@@ -15,17 +15,6 @@ fn setup() -> Result<(Command, assert_fs::TempDir), Box<dyn Error>> {
 }
 
 #[test]
-fn work_in_progress() -> Result<(), Box<dyn Error>> {
-    let (mut cmd, _tempdir) = setup()?;
-
-    cmd.assert()
-        .success()
-        .stdout(predicate::str::contains("Not fully implemented yet."));
-
-    Ok(())
-}
-
-#[test]
 fn creates_note() -> Result<(), Box<dyn Error>> {
     let (mut cmd, tempdir) = setup()?;
 
