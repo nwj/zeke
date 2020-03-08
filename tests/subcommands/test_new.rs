@@ -31,11 +31,11 @@ fn creates_note() -> Result<(), Box<dyn Error>> {
 
     let output = cmd.output()?;
     let stdout = str::from_utf8(&output.stdout)?;
-    let new_file_name = Regex::new(r"\d{14}.md")?.find(stdout).unwrap().as_str();
+    let new_path = Regex::new(r"\d{14}.md")?.find(stdout).unwrap().as_str();
+    tempdir.child(new_path).assert(predicate::path::is_file());
     tempdir
-        .child(new_file_name)
-        .assert(predicate::path::is_file());
-    tempdir.child(new_file_name).assert("Hello world");
+        .child(new_path)
+        .assert(predicate::str::contains("---\ntitle:"));
 
     Ok(())
 }
@@ -48,7 +48,9 @@ fn creates_note_with_given_id() -> Result<(), Box<dyn Error>> {
 
     cmd.assert().success();
     tempdir.child(new_path).assert(predicate::path::is_file());
-    tempdir.child(new_path).assert("Hello world");
+    tempdir
+        .child(new_path)
+        .assert(predicate::str::contains("---\ntitle:"));
 
     Ok(())
 }
