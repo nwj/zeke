@@ -1,7 +1,4 @@
-#[macro_use]
-extern crate clap;
-
-use clap::{App, AppSettings, Arg, SubCommand};
+use clap::{crate_description, crate_name, crate_version, App, AppSettings, Arg, SubCommand};
 use std::process;
 
 fn main() {
