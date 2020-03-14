@@ -1,11 +1,11 @@
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FrontMatter {
     title: String,
-    created: DateTime<Local>,
+    created: DateTime<Utc>,
     tags: Vec<String>,
     links_in: Vec<String>,
     links_out: Vec<String>,
@@ -15,7 +15,7 @@ impl FrontMatter {
     pub fn default() -> FrontMatter {
         FrontMatter {
             title: String::new(),
-            created: Local::now(),
+            created: Utc::now(),
             tags: Vec::new(),
             links_in: Vec::new(),
             links_out: Vec::new(),
