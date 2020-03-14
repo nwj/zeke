@@ -9,7 +9,9 @@ description = "A tool for managing notes using the 'zettelkasten' system"
 
 [dependencies]
 clap = "~2.33.0"
-chrono = "~0.4.10"
+chrono = { version = "~0.4.10", features = ["serde"] }
+serde = { version = "~1.0.104", features = ["derive"] }
+serde_yaml = "~0.8.11"
 
 [dev-dependencies]
 assert_cmd = "~0.12.0"
