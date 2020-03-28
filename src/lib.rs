@@ -1,7 +1,7 @@
 use clap::ArgMatches;
 use std::error::Error;
 
-mod frontmatter;
+mod front_matter;
 mod subcommands;
 
 pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {

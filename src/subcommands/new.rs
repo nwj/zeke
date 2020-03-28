@@ -1,4 +1,4 @@
-use crate::frontmatter::FrontMatter;
+use crate::front_matter::FrontMatter;
 use chrono::Utc;
 use clap::ArgMatches;
 use std::error::Error;

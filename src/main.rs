@@ -20,7 +20,7 @@ fn main() {
         .subcommand(SubCommand::with_name("tag").about("Tag one or more notes"))
         .subcommand(SubCommand::with_name("untag").about("Remove a tag from one or more notes"))
         .subcommand(SubCommand::with_name("list").about("List all notes that meet various criteria"))
-        .subcommand(SubCommand::with_name("backlink").about("Adds backlinks to the frontmatter of all notes"))
+        .subcommand(SubCommand::with_name("backlink").about("Adds backlinks to the front matter of all notes"))
         .get_matches();
 
     if let Err(e) = zeke::run(&matches) {

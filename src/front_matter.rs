@@ -29,8 +29,8 @@ impl FrontMatter {
 
     pub fn _from_yaml(s: String) -> Result<FrontMatter, Box<dyn Error>> {
         let trimmed = s.trim_end_matches("\n---");
-        let frontmatter = serde_yaml::from_str(&trimmed)?;
-        Ok(frontmatter)
+        let front_matter = serde_yaml::from_str(&trimmed)?;
+        Ok(front_matter)
     }
 }
 
@@ -49,7 +49,7 @@ mod tests {
     }
 
     prop_compose! {
-        fn arb_frontmatter() (
+        fn arb_front_matter() (
             title in "\\PC*",
             created in arb_datetime(),
             tags in proptest::collection::vec("\\PC*", 3),
@@ -62,7 +62,7 @@ mod tests {
 
     proptest! {
         #[test]
-        fn proptest_to_then_from_yaml (fm in arb_frontmatter()) {
+        fn proptest_to_then_from_yaml (fm in arb_front_matter()) {
             let converted_fm = FrontMatter::_from_yaml(fm.to_yaml().unwrap()).unwrap();
             assert_eq!(fm, converted_fm)
         }
