@@ -22,12 +22,12 @@ impl FrontMatter {
         }
     }
 
-    pub fn to_yaml(&self) -> Result<String, Box<dyn Error>> {
+    pub fn to_yaml_string(&self) -> Result<String, Box<dyn Error>> {
         let yaml = serde_yaml::to_string(&self)?;
         Ok(format!("{}\n---", yaml))
     }
 
-    pub fn _from_yaml(s: String) -> Result<FrontMatter, Box<dyn Error>> {
+    pub fn _from_yaml_string(s: String) -> Result<FrontMatter, Box<dyn Error>> {
         let trimmed = s.trim_end_matches("\n---");
         let front_matter = serde_yaml::from_str(&trimmed)?;
         Ok(front_matter)
@@ -63,7 +63,7 @@ mod tests {
     proptest! {
         #[test]
         fn proptest_to_then_from_yaml (fm in arb_front_matter()) {
-            let converted_fm = FrontMatter::_from_yaml(fm.to_yaml().unwrap()).unwrap();
+            let converted_fm = FrontMatter::_from_yaml_string(fm.to_yaml_string().unwrap()).unwrap();
             assert_eq!(fm, converted_fm)
         }
     }
