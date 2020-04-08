@@ -5,7 +5,7 @@ use std::error::Error;
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct FrontMatter {
     title: String,
-    created: DateTime<Utc>,
+    created: Option<DateTime<Utc>>,
     tags: Vec<String>,
     links_in: Vec<String>,
     links_out: Vec<String>,
@@ -15,7 +15,7 @@ impl FrontMatter {
     pub fn default() -> FrontMatter {
         FrontMatter {
             title: String::new(),
-            created: Utc::now(),
+            created: Some(Utc::now()),
             tags: Vec::new(),
             links_in: Vec::new(),
             links_out: Vec::new(),
@@ -51,11 +51,12 @@ mod tests {
     prop_compose! {
         fn arb_front_matter() (
             title in "\\PC*",
-            created in arb_datetime(),
+            date_time in arb_datetime(),
             tags in proptest::collection::vec("\\PC*", 3),
             links_in in proptest::collection::vec("\\PC*", 3),
             links_out in proptest::collection::vec("\\PC*", 3),
         ) -> FrontMatter {
+            let created = Some(date_time);
             FrontMatter { title, created, tags, links_in, links_out }
         }
     }
