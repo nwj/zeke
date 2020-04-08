@@ -28,7 +28,7 @@ impl FrontMatter {
     }
 
     pub fn _from_yaml_string(s: String) -> Result<FrontMatter, Box<dyn Error>> {
-        let trimmed = s.trim_end_matches("\n---");
+        let trimmed = s.trim_end().trim_end_matches("---").trim_end();
         let front_matter = serde_yaml::from_str(&trimmed)?;
         Ok(front_matter)
     }
