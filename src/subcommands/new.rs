@@ -14,7 +14,7 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .write(true)
         .create_new(true)
         .open(&path)?;
-    file.write_all(FrontMatter::default().to_yaml_string()?.as_bytes())?;
+    file.write_all(FrontMatter::new().to_yaml_string()?.as_bytes())?;
     println!("Created `{}` note file", &path);
 
     Ok(())

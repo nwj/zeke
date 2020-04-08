@@ -2,7 +2,8 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Default, Debug, PartialEq)]
+#[serde(default)]
 pub struct FrontMatter {
     title: String,
     created: Option<DateTime<Utc>>,
@@ -12,7 +13,7 @@ pub struct FrontMatter {
 }
 
 impl FrontMatter {
-    pub fn default() -> FrontMatter {
+    pub fn new() -> FrontMatter {
         FrontMatter {
             title: String::new(),
             created: Some(Utc::now()),
