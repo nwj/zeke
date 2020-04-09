@@ -5,11 +5,11 @@ use std::error::Error;
 #[derive(Serialize, Deserialize, Default, Debug, PartialEq)]
 #[serde(default)]
 pub struct FrontMatter {
-    title: String,
-    created: Option<DateTime<Utc>>,
-    tags: Vec<String>,
-    links_in: Vec<String>,
-    links_out: Vec<String>,
+    pub title: String,
+    pub created: Option<DateTime<Utc>>,
+    pub tags: Vec<String>,
+    pub links_in: Vec<String>,
+    pub links_out: Vec<String>,
 }
 
 impl FrontMatter {
@@ -51,11 +51,12 @@ mod tests {
 
     prop_compose! {
         fn arb_front_matter() (
-            title in "\\PC*",
+            // The regex here is all non-control, non-unicode-whitespace characters
+            title in "[^\\p{C}\\p{Z}]*",
             date_time in arb_datetime(),
-            tags in proptest::collection::vec("\\PC*", 3),
-            links_in in proptest::collection::vec("\\PC*", 3),
-            links_out in proptest::collection::vec("\\PC*", 3),
+            tags in proptest::collection::vec("[^\\p{C}\\p{Z}]*", 3),
+            links_in in proptest::collection::vec("[^\\p{C}\\p{Z}]*", 3),
+            links_out in proptest::collection::vec("[^\\p{C}\\p{Z}]*", 3),
         ) -> FrontMatter {
             let created = Some(date_time);
             FrontMatter { title, created, tags, links_in, links_out }

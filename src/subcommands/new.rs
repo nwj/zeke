@@ -1,4 +1,4 @@
-use crate::front_matter::FrontMatter;
+use crate::note::Note;
 use chrono::Utc;
 use clap::ArgMatches;
 use std::error::Error;
@@ -14,7 +14,7 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .write(true)
         .create_new(true)
         .open(&path)?;
-    file.write_all(FrontMatter::new().to_yaml_string()?.as_bytes())?;
+    file.write_all(Note::new().to_string()?.as_bytes())?;
     println!("Created `{}` note file", &path);
 
     Ok(())
