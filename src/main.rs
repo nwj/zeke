@@ -15,7 +15,22 @@ fn main() {
                     .index(1),
             ),
         )
-        .subcommand(SubCommand::with_name("link").about("Link a note to another note or notes"))
+        .subcommand(
+            SubCommand::with_name("link")
+                .about("Link a note to another note or notes")
+                .arg(
+                    Arg::with_name("FROM")
+                        .help("Path to the note to link from")
+                        .required(true)
+                        .index(1),
+                )
+                .arg(
+                    Arg::with_name("TO")
+                        .help("Path to the note to link to")
+                        .required(true)
+                        .index(2),
+                ),
+        )
         .subcommand(SubCommand::with_name("unlink").about("Unlink a note from another note or notes"))
         .subcommand(SubCommand::with_name("tag").about("Tag one or more notes"))
         .subcommand(SubCommand::with_name("untag").about("Remove a tag from one or more notes"))

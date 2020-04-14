@@ -3,7 +3,7 @@ use std::error::Error;
 
 #[derive(Debug, PartialEq)]
 pub struct Note {
-    front_matter: FrontMatter,
+    pub front_matter: FrontMatter,
     content: String,
 }
 
@@ -23,7 +23,7 @@ impl Note {
         ))
     }
 
-    pub fn _from_string(s: String) -> Result<Note, Box<dyn Error>> {
+    pub fn from_string(s: String) -> Result<Note, Box<dyn Error>> {
         if !s.starts_with("---\n") {
             return Ok(Note {
                 front_matter: FrontMatter::default(),
@@ -34,7 +34,7 @@ impl Note {
         let splits: Vec<_> = s.splitn(3, "---").collect();
         match (splits.get(1), splits.get(2)) {
             (Some(fm), Some(c)) => {
-                let front_matter = FrontMatter::_from_yaml_string(format!("---{}", fm))?;
+                let front_matter = FrontMatter::from_yaml_string(format!("---{}", fm))?;
                 // strip_prefix is experimental right now, but could potentially replace
                 // trim_start_matches here if/when that changes
                 let content = c.trim_start_matches("\n").to_string();
@@ -61,7 +61,7 @@ mod tests {
     #[test]
     fn from_string_no_content() -> Result<(), Box<dyn Error>> {
         let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: \"2020-04-08T00:05:56.075997Z\"\ntags:\n  - cats\nlinks_in: []\nlinks_out: []\n---";
-        let a = Note::_from_string(s.to_string())?;
+        let a = Note::from_string(s.to_string())?;
         let b = Note {
             front_matter: FrontMatter {
                 title: String::from("Lorem ipsum dolor sit amet"),
@@ -80,7 +80,7 @@ mod tests {
     #[test]
     fn from_string_no_front_matter() -> Result<(), Box<dyn Error>> {
         let s = "Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem...";
-        let a = Note::_from_string(s.to_string())?;
+        let a = Note::from_string(s.to_string())?;
         let b = Note {
             front_matter: FrontMatter {
                 title: String::new(),
@@ -99,7 +99,7 @@ mod tests {
     #[test]
     fn from_string_partial_front_matter() -> Result<(), Box<dyn Error>> {
         let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ntags: []\nlinks_in:\n  - cats.md\n---\nLorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem...";
-        let a = Note::_from_string(s.to_string())?;
+        let a = Note::from_string(s.to_string())?;
         let b = Note {
             front_matter: FrontMatter {
                 title: String::from("Lorem ipsum dolor sit amet"),
@@ -149,7 +149,7 @@ mod tests {
     proptest! {
         #[test]
         fn proptest_to_then_from_string (n in arb_note()) {
-            let converted_n = Note::_from_string(n.to_string().unwrap()).unwrap();
+            let converted_n = Note::from_string(n.to_string().unwrap()).unwrap();
             assert_eq!(n, converted_n)
         }
     }
