@@ -17,13 +17,13 @@ fn links_both_notes() -> Result<(), Box<dyn Error>> {
         .child(from_path)
         .assert(predicate::str::contains(format!(
             "links_out:\n  - {}\n",
-            to_path
+            to_path,
         )));
     t.temp_dir
         .child(to_path)
         .assert(predicate::str::contains(format!(
             "links_in:\n  - {}\n",
-            from_path
+            from_path,
         )));
 
     Ok(())
@@ -79,8 +79,33 @@ Esse cumque saepe laboriosam.";
     t.temp_dir.child(&to_path).write_str(&content)?;
 
     t.zeke_link(&from_path, &to_path)?.assert().success();
-    t.temp_dir.child(&from_path).assert(content.replace("links_out: []", "links_out:\n  - b.md"));
-    t.temp_dir.child(&to_path).assert(content.replace("links_in: []", "links_in:\n  - a.md"));
+    t.temp_dir
+        .child(&from_path)
+        .assert(content.replace("links_out: []", "links_out:\n  - b.md"));
+    t.temp_dir
+        .child(&to_path)
+        .assert(content.replace("links_in: []", "links_in:\n  - a.md"));
+
+    Ok(())
+}
+
+#[test]
+fn idempotent_if_linked_repeatedly() -> Result<(), Box<dyn Error>> {
+    let t = ZekeTester::new();
+    let from_path = "a.md";
+    let to_path = "b.md";
+    t.temp_dir.child(&from_path).touch()?;
+    t.temp_dir.child(&to_path).touch()?;
+
+    t.zeke_link(&from_path, &to_path)?.assert().success();
+    t.zeke_link(&from_path, &to_path)?.assert().success();
+
+    t.temp_dir
+        .child(from_path)
+        .assert(predicate::str::contains(to_path).count(1));
+    t.temp_dir
+        .child(to_path)
+        .assert(predicate::str::contains(from_path).count(1));
 
     Ok(())
 }

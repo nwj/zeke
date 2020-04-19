@@ -57,18 +57,21 @@ mod tests {
     use chrono::offset::TimeZone;
     use chrono::{DateTime, Utc};
     use proptest::prelude::*;
+    use std::collections::HashSet;
 
     #[test]
     fn from_string_no_content() -> Result<(), Box<dyn Error>> {
         let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: \"2020-04-08T00:05:56.075997Z\"\ntags:\n  - cats\nlinks_in: []\nlinks_out: []\n---";
         let a = Note::from_string(s.to_string())?;
+        let mut ts = HashSet::new();
+        ts.insert(String::from("cats"));
         let b = Note {
             front_matter: FrontMatter {
                 title: String::from("Lorem ipsum dolor sit amet"),
                 created: Some(Utc.ymd(2020, 4, 8).and_hms_micro(0, 5, 56, 75_997)),
-                tags: vec![String::from("cats")],
-                links_in: Vec::new(),
-                links_out: Vec::new(),
+                tags: ts,
+                links_in: HashSet::new(),
+                links_out: HashSet::new(),
             },
             content: String::new(),
         };
@@ -85,9 +88,9 @@ mod tests {
             front_matter: FrontMatter {
                 title: String::new(),
                 created: None,
-                tags: Vec::new(),
-                links_in: Vec::new(),
-                links_out: Vec::new(),
+                tags: HashSet::new(),
+                links_in: HashSet::new(),
+                links_out: HashSet::new(),
             },
             content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
         };
@@ -100,13 +103,15 @@ mod tests {
     fn from_string_partial_front_matter() -> Result<(), Box<dyn Error>> {
         let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ntags: []\nlinks_in:\n  - cats.md\n---\nLorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem...";
         let a = Note::from_string(s.to_string())?;
+        let mut ls = HashSet::new();
+        ls.insert(String::from("cats.md"));
         let b = Note {
             front_matter: FrontMatter {
                 title: String::from("Lorem ipsum dolor sit amet"),
                 created: None,
-                tags: Vec::new(),
-                links_in: vec!(String::from("cats.md")),
-                links_out: Vec::new(),
+                tags: HashSet::new(),
+                links_in: ls,
+                links_out: HashSet::new(),
             },
             content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
         };
@@ -128,9 +133,9 @@ mod tests {
             // The regex here is all non-control, non-unicode-whitespace characters
             title in "[^\\p{C}\\p{Z}]*",
             date_time in arb_datetime(),
-            tags in proptest::collection::vec("[^\\p{C}\\p{Z}]*", 3),
-            links_in in proptest::collection::vec("[^\\p{C}\\p{Z}]*", 3),
-            links_out in proptest::collection::vec("[^\\p{C}\\p{Z}]*", 3),
+            tags in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
+            links_in in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
+            links_out in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
         ) -> FrontMatter {
             let created = Some(date_time);
             FrontMatter { title, created, tags, links_in, links_out }

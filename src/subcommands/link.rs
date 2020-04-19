@@ -34,8 +34,8 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let mut from_note = Note::from_string(from_contents)?;
     let mut to_note = Note::from_string(to_contents)?;
 
-    from_note.front_matter.links_out.push(to.clone());
-    to_note.front_matter.links_in.push(from.clone());
+    from_note.front_matter.links_out.insert(to.clone());
+    to_note.front_matter.links_in.insert(from.clone());
 
     let mut from_file_out = OpenOptions::new()
         .write(true)

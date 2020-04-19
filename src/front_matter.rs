@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::error::Error;
 
 #[derive(Serialize, Deserialize, Default, Debug, PartialEq)]
@@ -7,9 +8,9 @@ use std::error::Error;
 pub struct FrontMatter {
     pub title: String,
     pub created: Option<DateTime<Utc>>,
-    pub tags: Vec<String>,
-    pub links_in: Vec<String>,
-    pub links_out: Vec<String>,
+    pub tags: HashSet<String>,
+    pub links_in: HashSet<String>,
+    pub links_out: HashSet<String>,
 }
 
 impl FrontMatter {
@@ -17,9 +18,9 @@ impl FrontMatter {
         FrontMatter {
             title: String::new(),
             created: Some(Utc::now()),
-            tags: Vec::new(),
-            links_in: Vec::new(),
-            links_out: Vec::new(),
+            tags: HashSet::new(),
+            links_in: HashSet::new(),
+            links_out: HashSet::new(),
         }
     }
 
@@ -54,9 +55,9 @@ mod tests {
             // The regex here is all non-control, non-unicode-whitespace characters
             title in "[^\\p{C}\\p{Z}]*",
             date_time in arb_datetime(),
-            tags in proptest::collection::vec("[^\\p{C}\\p{Z}]*", 3),
-            links_in in proptest::collection::vec("[^\\p{C}\\p{Z}]*", 3),
-            links_out in proptest::collection::vec("[^\\p{C}\\p{Z}]*", 3),
+            tags in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
+            links_in in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
+            links_out in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
         ) -> FrontMatter {
             let created = Some(date_time);
             FrontMatter { title, created, tags, links_in, links_out }
