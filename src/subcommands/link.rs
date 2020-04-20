@@ -20,10 +20,7 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .create_new(false)
         .open(&from)?;
 
-    let mut to_file_in = OpenOptions::new()
-        .read(true)
-        .create_new(false)
-        .open(&to)?;
+    let mut to_file_in = OpenOptions::new().read(true).create_new(false).open(&to)?;
 
     let mut from_contents = String::new();
     from_file_in.read_to_string(&mut from_contents)?;
@@ -52,6 +49,6 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     to_file_out.write_all(to_note.to_string()?.as_bytes())?;
     from_file_out.write_all(from_note.to_string()?.as_bytes())?;
 
-    println!("Linked {} to {}", &from, &to);
+    println!("Linked `{}` to `{}`", &from, &to);
     Ok(())
 }

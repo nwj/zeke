@@ -9,10 +9,10 @@ fn links_both_notes() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
     let from_path = "a.md";
     let to_path = "b.md";
-    t.temp_dir.child(&from_path).touch()?;
-    t.temp_dir.child(&to_path).touch()?;
+    t.temp_dir.child(from_path).touch()?;
+    t.temp_dir.child(to_path).touch()?;
 
-    t.zeke_link(&from_path, &to_path)?.assert().success();
+    t.zeke_link(from_path, to_path)?.assert().success();
     t.temp_dir
         .child(from_path)
         .assert(predicate::str::contains(format!(
@@ -34,9 +34,12 @@ fn fails_without_extant_from_path() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
     let from_path = "a.md";
     let to_path = "b.md";
-    t.temp_dir.child(&to_path).touch()?;
+    t.temp_dir.child(to_path).touch()?;
 
-    t.zeke_link(&from_path, &to_path)?.assert().failure();
+    t.zeke_link(from_path, to_path)?.assert().failure();
+    t.temp_dir
+        .child(from_path)
+        .assert(predicate::path::missing());
     t.temp_dir
         .child(to_path)
         .assert(predicate::str::contains(format!("links_in:\n  - {}\n", from_path)).not());
@@ -49,12 +52,13 @@ fn fails_without_extant_to_path() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
     let from_path = "a.md";
     let to_path = "b.md";
-    t.temp_dir.child(&from_path).touch()?;
+    t.temp_dir.child(from_path).touch()?;
 
-    t.zeke_link(&from_path, &to_path)?.assert().failure();
+    t.zeke_link(from_path, to_path)?.assert().failure();
     t.temp_dir
         .child(from_path)
         .assert(predicate::str::contains(format!("links_in:\n  - {}\n", to_path)).not());
+    t.temp_dir.child(to_path).assert(predicate::path::missing());
 
     Ok(())
 }
@@ -75,16 +79,16 @@ links_out: []
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.";
 
-    t.temp_dir.child(&from_path).write_str(&content)?;
-    t.temp_dir.child(&to_path).write_str(&content)?;
+    t.temp_dir.child(from_path).write_str(content)?;
+    t.temp_dir.child(to_path).write_str(content)?;
 
-    t.zeke_link(&from_path, &to_path)?.assert().success();
+    t.zeke_link(from_path, to_path)?.assert().success();
     t.temp_dir
-        .child(&from_path)
-        .assert(content.replace("links_out: []", "links_out:\n  - b.md"));
+        .child(from_path)
+        .assert(content.replace("links_out: []", &format!("links_out:\n  - {}", to_path)));
     t.temp_dir
-        .child(&to_path)
-        .assert(content.replace("links_in: []", "links_in:\n  - a.md"));
+        .child(to_path)
+        .assert(content.replace("links_in: []", &format!("links_in:\n  - {}", from_path)));
 
     Ok(())
 }
@@ -94,11 +98,11 @@ fn idempotent_if_linked_repeatedly() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
     let from_path = "a.md";
     let to_path = "b.md";
-    t.temp_dir.child(&from_path).touch()?;
-    t.temp_dir.child(&to_path).touch()?;
+    t.temp_dir.child(from_path).touch()?;
+    t.temp_dir.child(to_path).touch()?;
 
-    t.zeke_link(&from_path, &to_path)?.assert().success();
-    t.zeke_link(&from_path, &to_path)?.assert().success();
+    t.zeke_link(from_path, to_path)?.assert().success();
+    t.zeke_link(from_path, to_path)?.assert().success();
 
     t.temp_dir
         .child(from_path)
