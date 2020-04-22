@@ -25,15 +25,16 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let mut note = Note::from_string(file_contents)?;
 
-    note.front_matter.tags.insert(tag.clone());
+    if !note.front_matter.tags.contains(&tag) {
+        note.front_matter.tags.insert(tag.clone());
+        let mut file_out = OpenOptions::new()
+            .write(true)
+            .create_new(false)
+            .truncate(true)
+            .open(&path)?;
 
-    let mut file_out = OpenOptions::new()
-        .write(true)
-        .create_new(false)
-        .truncate(true)
-        .open(&path)?;
-
-    file_out.write_all(note.to_string()?.as_bytes())?;
+        file_out.write_all(note.to_string()?.as_bytes())?;
+    }
 
     println!("Tagged `{}` with `{}`", &path, &tag);
     Ok(())
