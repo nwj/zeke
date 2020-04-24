@@ -51,6 +51,6 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         to_file_out.write_all(to_note.to_string()?.as_bytes())?;
     }
 
-    println!("Linked `{}` to `{}`", &from, &to);
+    println!("Unlinked `{}` from `{}`", &from, &to);
     Ok(())
 }
