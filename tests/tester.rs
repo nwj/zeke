@@ -45,4 +45,10 @@ impl ZekeTester {
         cmd.arg("tag").arg(path).arg(tag);
         Ok(cmd)
     }
+
+    pub fn zeke_untag(&self, path: &str, tag: &str) -> Result<Command, Box<dyn Error>> {
+        let mut cmd = self.zeke()?;
+        cmd.arg("untag").arg(path).arg(tag);
+        Ok(cmd)
+    }
 }

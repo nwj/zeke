@@ -63,7 +63,22 @@ fn main() {
                         .index(2),
                 ),
         )
-        .subcommand(SubCommand::with_name("untag").about("Remove a tag from a note"))
+        .subcommand(
+            SubCommand::with_name("untag")
+                .about("Remove a tag from a note")
+                .arg(
+                    Arg::with_name("FILE")
+                        .help("Path to the note to tag")
+                        .required(true)
+                        .index(1),
+                )
+                .arg(
+                    Arg::with_name("TAG")
+                        .help("Tag to apply to the note")
+                        .required(true)
+                        .index(2),
+                ),
+        )
         .subcommand(SubCommand::with_name("list").about("List all notes that meet various criteria"))
         .subcommand(SubCommand::with_name("backlink").about("Adds backlinks to the front matter of all notes"))
         .get_matches();
