@@ -19,12 +19,9 @@ impl ZekeTester {
         Ok(cmd)
     }
 
-    pub fn zeke_new(&self, path: Option<&str>) -> Result<Command, Box<dyn Error>> {
+    pub fn zeke_new(&self, title: &str) -> Result<Command, Box<dyn Error>> {
         let mut cmd = self.zeke()?;
-        cmd.arg("new");
-        if let Some(p) = path {
-            cmd.arg(p);
-        }
+        cmd.arg("new").arg(title);
         Ok(cmd)
     }
 
