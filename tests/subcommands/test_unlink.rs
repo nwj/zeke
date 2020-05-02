@@ -15,13 +15,14 @@ title: Sint omnis et qui qui
 created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - quisquam
-links_in: []
+links_in:
+  - {}
 links_out:
   - {}
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",
-        to_path
+        to_path, to_path
     );
     let to_content = format!(
         "---
@@ -31,11 +32,12 @@ tags:
   - quisquam
 links_in:
   - {}
-links_out: []
+links_out:
+  - {}
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",
-        from_path
+        from_path, from_path
     );
     t.temp_dir.child(from_path).write_str(&from_content)?;
     t.temp_dir.child(to_path).write_str(&to_content)?;
@@ -43,10 +45,12 @@ Esse cumque saepe laboriosam.",
     t.zeke_unlink(from_path, to_path)?.assert().success();
     t.temp_dir
         .child(from_path)
+        .assert(predicate::str::contains(format!("links_in:\n  - {}\n", to_path,)).not())
         .assert(predicate::str::contains(format!("links_out:\n  - {}\n", to_path,)).not());
     t.temp_dir
         .child(to_path)
-        .assert(predicate::str::contains(format!("links_in:\n  - {}\n", from_path,)).not());
+        .assert(predicate::str::contains(format!("links_in:\n  - {}\n", from_path,)).not())
+        .assert(predicate::str::contains(format!("links_out:\n  - {}\n", from_path,)).not());
 
     Ok(())
 }
