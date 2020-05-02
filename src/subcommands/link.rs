@@ -31,8 +31,7 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let mut from_note = Note::from_string(from_contents)?;
     let mut to_note = Note::from_string(to_contents)?;
 
-    if !from_note.front_matter.links_out.contains(&to) {
-        from_note.front_matter.links_out.insert(to.clone());
+    if from_note.front_matter.links_out.insert(to.clone()) {
         let mut from_file_out = OpenOptions::new()
             .write(true)
             .create_new(false)
@@ -41,8 +40,7 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         from_file_out.write_all(from_note.to_string()?.as_bytes())?;
     }
 
-    if !to_note.front_matter.links_in.contains(&from) {
-        to_note.front_matter.links_in.insert(from.clone());
+    if to_note.front_matter.links_in.insert(from.clone()) {
         let mut to_file_out = OpenOptions::new()
             .write(true)
             .create_new(false)

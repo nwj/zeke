@@ -25,8 +25,7 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let mut note = Note::from_string(file_contents)?;
 
-    if note.front_matter.tags.contains(&tag) {
-        note.front_matter.tags.remove(&tag);
+    if note.front_matter.tags.remove(&tag) {
         let mut file_out = OpenOptions::new()
             .write(true)
             .create_new(false)
