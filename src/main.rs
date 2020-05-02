@@ -8,12 +8,20 @@ fn main() {
         .setting(AppSettings::ArgRequiredElseHelp)
         .setting(AppSettings::VersionlessSubcommands)
         .subcommand(
-            SubCommand::with_name("new").about("Create a new note").arg(
-                Arg::with_name("TITLE")
-                    .help("Title for the new note")
-                    .required(true)
-                    .index(1),
-            ),
+            SubCommand::with_name("new")
+                .about("Create a new note")
+                .arg(
+                    Arg::with_name("TITLE")
+                        .help("Title for the new note")
+                        .required(true)
+                        .index(1),
+                )
+                .arg(
+                    Arg::with_name("edit")
+                        .short("e")
+                        .help("Opens the new note in the editor specified by the $ZEKE_EDITOR env variable")
+                        .long("edit"),
+                ),
         )
         .subcommand(
             SubCommand::with_name("link")

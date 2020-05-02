@@ -5,6 +5,8 @@ use regex::Regex;
 use std::error::Error;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use std::process::Command;
+use std::env;
 
 pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let title = match matches.value_of("TITLE") {
@@ -27,6 +29,11 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .open(&path)?;
     file.write_all(note.to_string()?.as_bytes())?;
     println!("Created `{}` note file", &path);
+
+    if matches.is_present("edit") {
+        let cmd = env::var("ZEKE_EDITOR")?;
+        Command::new(cmd).arg(&path).spawn()?.wait()?;
+    }
 
     Ok(())
 }

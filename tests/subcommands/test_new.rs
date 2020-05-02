@@ -39,3 +39,23 @@ fn does_not_overwrite_existing_files() -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+#[test]
+fn spawns_editor_process_if_edit_flag() -> Result<(), Box<dyn Error>> {
+    let t = ZekeTester::new();
+    let title = "foo";
+
+    let output = t.zeke_new(title)?.arg("-e").env("ZEKE_EDITOR", "echo").output()?;
+    let stdout = str::from_utf8(&output.stdout)?;
+    assert_eq!(stdout.matches(title).count(), 2);
+
+    Ok(())
+}
+
+#[test]
+fn fails_gracefully_if_edit_flag_but_no_editor() -> Result<(), Box<dyn Error>> {
+    let t = ZekeTester::new();
+    t.zeke_new("bar")?.arg("-e").env_clear().assert().failure();
+
+    Ok(())
+}
