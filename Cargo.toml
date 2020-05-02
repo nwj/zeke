@@ -1,6 +1,6 @@
 [package]
 name = "zeke"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Nick Willett-Jeffries <hello@nwj.cc>"]
 edition = "2018"
 description = "A tool for managing notes using the 'zettelkasten' system"
