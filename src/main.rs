@@ -76,13 +76,13 @@ fn main() {
                 .about("Remove a tag from a note")
                 .arg(
                     Arg::with_name("FILE")
-                        .help("Path to the note to tag")
+                        .help("Path to the note to untag")
                         .required(true)
                         .index(1),
                 )
                 .arg(
                     Arg::with_name("TAG")
-                        .help("Tag to apply to the note")
+                        .help("Tag to remove from the note")
                         .required(true)
                         .index(2),
                 ),
