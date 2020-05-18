@@ -1,9 +1,9 @@
 [package]
 name = "zeke"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Nick Willett-Jeffries <hello@nwj.cc>"]
 edition = "2018"
-description = "A tool for managing notes using the 'zettelkasten' system"
+description = "A CLI for managing a personal note archive in a future-resilient way"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
