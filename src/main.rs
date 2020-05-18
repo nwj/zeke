@@ -56,6 +56,10 @@ fn main() {
                 ),
         )
         .subcommand(
+            SubCommand::with_name("tags")
+                .about("List all tags")
+        )
+        .subcommand(
             SubCommand::with_name("tag")
                 .about("Tag a note")
                 .arg(

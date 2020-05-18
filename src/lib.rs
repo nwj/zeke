@@ -10,6 +10,7 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         ("new", Some(m)) => subcommands::new::run(m),
         ("link", Some(m)) => subcommands::link::run(m),
         ("unlink", Some(m)) => subcommands::unlink::run(m),
+        ("tags", Some(_)) => subcommands::tags::run(),
         ("tag", Some(m)) => subcommands::tag::run(m),
         ("untag", Some(m)) => subcommands::untag::run(m),
         ("list", Some(m)) => subcommands::list::run(m),

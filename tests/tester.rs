@@ -37,6 +37,12 @@ impl ZekeTester {
         Ok(cmd)
     }
 
+    pub fn zeke_tags(&self) -> Result<Command, Box<dyn Error>> {
+        let mut cmd = self.zeke()?;
+        cmd.arg("tags");
+        Ok(cmd)
+    }
+
     pub fn zeke_tag(&self, path: &str, tag: &str) -> Result<Command, Box<dyn Error>> {
         let mut cmd = self.zeke()?;
         cmd.arg("tag").arg(path).arg(tag);
