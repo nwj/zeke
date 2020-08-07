@@ -1,5 +1,7 @@
 use crate::front_matter::FrontMatter;
+use regex::Regex;
 use std::error::Error;
+use std::path::PathBuf;
 
 #[derive(Debug, PartialEq)]
 pub struct Note {
@@ -48,6 +50,17 @@ impl Note {
                 content: s,
             }),
         }
+    }
+
+    pub fn generate_path(&self) -> Result<PathBuf, Box<dyn Error>> {
+        let title_part = Regex::new(r"\s")?
+            .replace_all(&self.front_matter.title, "_")
+            .to_lowercase();
+        let path_string = match self.front_matter.created {
+            Some(ts) => format!("{}-{}.md", ts.format("%Y%m%d"), title_part),
+            None => format!("{}.md", title_part),
+        };
+        Ok(PathBuf::from(path_string))
     }
 }
 
@@ -117,6 +130,38 @@ mod tests {
         };
 
         assert_eq!(a, b);
+        Ok(())
+    }
+
+    #[test]
+    fn generate_path() -> Result<(), Box<dyn Error>> {
+        let n = Note {
+            front_matter: FrontMatter {
+                title: String::from("This is a test"),
+                created: Some(Utc.ymd(2020, 4, 8).and_hms_micro(0, 5, 56, 75_997)),
+                tags: HashSet::new(),
+                links_in: HashSet::new(),
+                links_out: HashSet::new(),
+            },
+            content: String::new(),
+        };
+        assert_eq!(n.generate_path()?, PathBuf::from("20200408-this_is_a_test.md"));
+        Ok(())
+    }
+
+    #[test]
+    fn generate_path_no_created_date() -> Result<(), Box<dyn Error>> {
+        let n = Note {
+            front_matter: FrontMatter {
+                title: String::from("This is a test"),
+                created: None,
+                tags: HashSet::new(),
+                links_in: HashSet::new(),
+                links_out: HashSet::new(),
+            },
+            content: String::new(),
+        };
+        assert_eq!(n.generate_path()?, PathBuf::from("this_is_a_test.md"));
         Ok(())
     }
 

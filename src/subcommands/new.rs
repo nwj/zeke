@@ -1,7 +1,5 @@
 use crate::note::Note;
-use chrono::Utc;
 use clap::ArgMatches;
-use regex::Regex;
 use std::error::Error;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
@@ -15,20 +13,15 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     };
 
     let mut note = Note::new();
-    let path = format!(
-        "{}-{}.md",
-        Utc::now().format("%Y%m%d").to_string(),
-        Regex::new(r"\s")?.replace_all(&title, "_")
-    )
-    .to_lowercase();
     note.front_matter.title = title;
 
+    let path = note.generate_path()?;
     let mut file = OpenOptions::new()
         .write(true)
         .create_new(true)
         .open(&path)?;
     file.write_all(note.to_string()?.as_bytes())?;
-    println!("Created `{}` note file", &path);
+    println!("Created `{}` note file", &path.to_string_lossy());
 
     if matches.is_present("edit") {
         let cmd = env::var("ZEKE_EDITOR")?;
