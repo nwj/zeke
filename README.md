@@ -1,6 +1,12 @@
 # zeke
 
-A CLI for managing a personal note archive in a future-resilient way.
+Zeke is a CLI for managing a personal note archive of plain text markdown files.
+
+## Philosophy
+
+A file system, a text editor, and markdown can provide most of the functionality of more "feature rich" note taking applications. These technologies have survived the test of time, will likely continue to work (even years from now), and leave you in full control of your data. Since notes are just text files, you are free to use any of the wide variety of sync, encryption, and data processing tools that work with text. It is an ideal system for note taking projects that aim at longevity, such as personal knowledge bases and zettelkasten.
+
+Zeke aims to augment these technologies by automating some of the more manual or error prone tasks that are required to organize and manage a large collection of text notes.
 
 ## Usage
 
@@ -19,7 +25,7 @@ $ cat 20200502-my_note.md
  ---
 ```
 
-Notes are markdown files, named using a date and a formatted version of the note title. Each note includes YAML front-matter with various meta information.
+Notes are markdown files, named using a date and a formatted version of the note title. Each note includes YAML front-matter with basic meta-data.
 
 ### Create a new note and open it in a text editor
 
