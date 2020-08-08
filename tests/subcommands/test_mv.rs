@@ -6,7 +6,7 @@ use std::process::Command;
 #[test]
 fn not_implemented() -> Result<(), Box<dyn Error>> {
     let mut cmd = Command::cargo_bin("zeke")?;
-    cmd.arg("list");
+    cmd.arg("mv");
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("Not yet implemented."));

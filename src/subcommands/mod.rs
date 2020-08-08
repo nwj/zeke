@@ -1,6 +1,8 @@
 pub mod backlink;
+pub mod graph;
 pub mod link;
-pub mod list;
+pub mod ls;
+pub mod mv;
 pub mod new;
 pub mod tag;
 pub mod tags;
