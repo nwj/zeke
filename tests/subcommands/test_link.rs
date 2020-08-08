@@ -7,58 +7,56 @@ use std::error::Error;
 #[test]
 fn links_both_notes() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
-    let from_path = "a.md";
-    let to_path = "b.md";
-    t.temp_dir.child(from_path).touch()?;
-    t.temp_dir.child(to_path).touch()?;
+    let path_a = "a.md";
+    let path_b = "b.md";
+    t.temp_dir.child(path_a).touch()?;
+    t.temp_dir.child(path_b).touch()?;
 
-    t.zeke_link(from_path, to_path)?.assert().success();
+    t.zeke_link(path_a, path_b)?.assert().success();
     t.temp_dir
-        .child(from_path)
+        .child(path_a)
         .assert(predicate::str::contains(format!(
-            "links_out:\n  - {}\n",
-            to_path,
+            "links:\n  - {}\n",
+            path_b,
         )));
     t.temp_dir
-        .child(to_path)
+        .child(path_b)
         .assert(predicate::str::contains(format!(
-            "links_in:\n  - {}\n",
-            from_path,
+            "links:\n  - {}\n",
+            path_a,
         )));
 
     Ok(())
 }
 
 #[test]
-fn fails_without_extant_from_path() -> Result<(), Box<dyn Error>> {
+fn fails_without_extant_path_a() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
-    let from_path = "a.md";
-    let to_path = "b.md";
-    t.temp_dir.child(to_path).touch()?;
+    let path_a = "a.md";
+    let path_b = "b.md";
+    t.temp_dir.child(path_b).touch()?;
 
-    t.zeke_link(from_path, to_path)?.assert().failure();
+    t.zeke_link(path_a, path_b)?.assert().failure();
+    t.temp_dir.child(path_a).assert(predicate::path::missing());
     t.temp_dir
-        .child(from_path)
-        .assert(predicate::path::missing());
-    t.temp_dir
-        .child(to_path)
-        .assert(predicate::str::contains(format!("links_in:\n  - {}\n", from_path)).not());
+        .child(path_b)
+        .assert(predicate::str::contains(format!("links:\n  - {}\n", path_a)).not());
 
     Ok(())
 }
 
 #[test]
-fn fails_without_extant_to_path() -> Result<(), Box<dyn Error>> {
+fn fails_without_extant_path_b() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
-    let from_path = "a.md";
-    let to_path = "b.md";
-    t.temp_dir.child(from_path).touch()?;
+    let path_a = "a.md";
+    let path_b = "b.md";
+    t.temp_dir.child(path_a).touch()?;
 
-    t.zeke_link(from_path, to_path)?.assert().failure();
+    t.zeke_link(path_a, path_b)?.assert().failure();
     t.temp_dir
-        .child(from_path)
-        .assert(predicate::str::contains(format!("links_in:\n  - {}\n", to_path)).not());
-    t.temp_dir.child(to_path).assert(predicate::path::missing());
+        .child(path_a)
+        .assert(predicate::str::contains(format!("links:\n  - {}\n", path_b)).not());
+    t.temp_dir.child(path_b).assert(predicate::path::missing());
 
     Ok(())
 }
@@ -66,29 +64,28 @@ fn fails_without_extant_to_path() -> Result<(), Box<dyn Error>> {
 #[test]
 fn does_not_modify_other_file_content() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
-    let from_path = "a.md";
-    let to_path = "b.md";
+    let path_a = "a.md";
+    let path_b = "b.md";
     let content = "---
 title: Sint omnis et qui qui
 created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - quisquam
-links_in: []
-links_out: []
+links: []
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.";
 
-    t.temp_dir.child(from_path).write_str(content)?;
-    t.temp_dir.child(to_path).write_str(content)?;
+    t.temp_dir.child(path_a).write_str(content)?;
+    t.temp_dir.child(path_b).write_str(content)?;
 
-    t.zeke_link(from_path, to_path)?.assert().success();
+    t.zeke_link(path_a, path_b)?.assert().success();
     t.temp_dir
-        .child(from_path)
-        .assert(content.replace("links_out: []", &format!("links_out:\n  - {}", to_path)));
+        .child(path_a)
+        .assert(content.replace("links: []", &format!("links:\n  - {}", path_b)));
     t.temp_dir
-        .child(to_path)
-        .assert(content.replace("links_in: []", &format!("links_in:\n  - {}", from_path)));
+        .child(path_b)
+        .assert(content.replace("links: []", &format!("links:\n  - {}", path_a)));
 
     Ok(())
 }
@@ -96,20 +93,20 @@ Esse cumque saepe laboriosam.";
 #[test]
 fn idempotent_if_linked_repeatedly() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
-    let from_path = "a.md";
-    let to_path = "b.md";
-    t.temp_dir.child(from_path).touch()?;
-    t.temp_dir.child(to_path).touch()?;
+    let path_a = "a.md";
+    let path_b = "b.md";
+    t.temp_dir.child(path_a).touch()?;
+    t.temp_dir.child(path_b).touch()?;
 
-    t.zeke_link(from_path, to_path)?.assert().success();
-    t.zeke_link(from_path, to_path)?.assert().success();
+    t.zeke_link(path_a, path_b)?.assert().success();
+    t.zeke_link(path_a, path_b)?.assert().success();
 
     t.temp_dir
-        .child(from_path)
-        .assert(predicate::str::contains(to_path).count(1));
+        .child(path_a)
+        .assert(predicate::str::contains(path_b).count(1));
     t.temp_dir
-        .child(to_path)
-        .assert(predicate::str::contains(from_path).count(1));
+        .child(path_b)
+        .assert(predicate::str::contains(path_a).count(1));
 
     Ok(())
 }

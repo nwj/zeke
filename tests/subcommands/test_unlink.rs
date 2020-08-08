@@ -7,84 +7,76 @@ use std::error::Error;
 #[test]
 fn unlinks_both_notes() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
-    let from_path = "a.md";
-    let to_path = "b.md";
-    let from_content = format!(
+    let path_a = "a.md";
+    let path_b = "b.md";
+    let content_a = format!(
         "---
 title: Sint omnis et qui qui
 created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - quisquam
-links_in:
-  - {}
-links_out:
+links:
   - {}
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",
-        to_path, to_path
+        path_b
     );
-    let to_content = format!(
+    let content_b = format!(
         "---
 title: Sint omnis et qui qui
 created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - quisquam
-links_in:
-  - {}
-links_out:
+links:
   - {}
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",
-        from_path, from_path
+        path_a
     );
-    t.temp_dir.child(from_path).write_str(&from_content)?;
-    t.temp_dir.child(to_path).write_str(&to_content)?;
+    t.temp_dir.child(path_a).write_str(&content_a)?;
+    t.temp_dir.child(path_b).write_str(&content_b)?;
 
-    t.zeke_unlink(from_path, to_path)?.assert().success();
+    t.zeke_unlink(path_a, path_b)?.assert().success();
     t.temp_dir
-        .child(from_path)
-        .assert(predicate::str::contains(format!("links_in:\n  - {}\n", to_path,)).not())
-        .assert(predicate::str::contains(format!("links_out:\n  - {}\n", to_path,)).not());
+        .child(path_a)
+        .assert(predicate::str::contains(format!("links:\n  - {}\n", path_b,)).not());
     t.temp_dir
-        .child(to_path)
-        .assert(predicate::str::contains(format!("links_in:\n  - {}\n", from_path,)).not())
-        .assert(predicate::str::contains(format!("links_out:\n  - {}\n", from_path,)).not());
+        .child(path_b)
+        .assert(predicate::str::contains(format!("links:\n  - {}\n", path_a,)).not());
 
     Ok(())
 }
 
 #[test]
-fn fails_without_extant_from_path() -> Result<(), Box<dyn Error>> {
+fn fails_without_extant_path_a() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
-    let from_path = "a.md";
-    let to_path = "b.md";
-    t.temp_dir.child(to_path).touch()?;
+    let path_a = "a.md";
+    let path_b = "b.md";
+    t.temp_dir.child(path_b).touch()?;
 
-    t.zeke_unlink(from_path, to_path)?.assert().failure();
+    t.zeke_unlink(path_a, path_b)?.assert().failure();
+    t.temp_dir.child(path_a).assert(predicate::path::missing());
     t.temp_dir
-        .child(from_path)
-        .assert(predicate::path::missing());
-    t.temp_dir
-        .child(to_path)
-        .assert(predicate::str::contains(format!("links_in:\n  - {}\n", from_path)).not());
+        .child(path_b)
+        .assert(predicate::str::contains(format!("links:\n  - {}\n", path_a)).not());
 
     Ok(())
 }
 
 #[test]
-fn fails_without_extant_to_path() -> Result<(), Box<dyn Error>> {
+fn fails_without_extant_path_b() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
-    let from_path = "a.md";
-    let to_path = "b.md";
-    t.temp_dir.child(from_path).touch()?;
+    let path_a = "a.md";
+    let path_b = "b.md";
+    t.temp_dir.child(path_a).touch()?;
 
-    t.zeke_unlink(from_path, to_path)?.assert().failure();
+    t.zeke_unlink(path_a, path_b)?.assert().failure();
     t.temp_dir
-        .child(from_path)
-        .assert(predicate::str::contains(format!("links_in:\n  - {}\n", to_path)).not());
-    t.temp_dir.child(to_path).assert(predicate::path::missing());
+        .child(path_a)
+        .assert(predicate::str::contains(format!("links:\n  - {}\n", path_b)).not());
+    t.temp_dir.child(path_b).assert(predicate::path::missing());
 
     Ok(())
 }
@@ -92,46 +84,44 @@ fn fails_without_extant_to_path() -> Result<(), Box<dyn Error>> {
 #[test]
 fn does_not_modify_other_file_content() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
-    let from_path = "a.md";
-    let to_path = "b.md";
-    let from_content = format!(
+    let path_a = "a.md";
+    let path_b = "b.md";
+    let content_a = format!(
         "---
 title: Sint omnis et qui qui
 created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - quisquam
-links_in: []
-links_out:
+links:
   - {}
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",
-        to_path
+        path_b
     );
-    let to_content = format!(
+    let content_b = format!(
         "---
 title: Sint omnis et qui qui
 created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - quisquam
-links_in:
+links:
   - {}
-links_out: []
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",
-        from_path
+        path_a
     );
-    t.temp_dir.child(from_path).write_str(&from_content)?;
-    t.temp_dir.child(to_path).write_str(&to_content)?;
+    t.temp_dir.child(path_a).write_str(&content_a)?;
+    t.temp_dir.child(path_b).write_str(&content_b)?;
 
-    t.zeke_unlink(from_path, to_path)?.assert().success();
+    t.zeke_unlink(path_a, path_b)?.assert().success();
     t.temp_dir
-        .child(from_path)
-        .assert(from_content.replace(&format!("links_out:\n  - {}", to_path), "links_out: []"));
+        .child(path_a)
+        .assert(content_a.replace(&format!("links:\n  - {}", path_b), "links: []"));
     t.temp_dir
-        .child(to_path)
-        .assert(to_content.replace(&format!("links_in:\n  - {}", from_path), "links_in: []"));
+        .child(path_b)
+        .assert(content_b.replace(&format!("links:\n  - {}", path_a), "links: []"));
 
     Ok(())
 }

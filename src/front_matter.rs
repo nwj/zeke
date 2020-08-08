@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::error::Error;
+use std::path::PathBuf;
 
 #[derive(Serialize, Deserialize, Default, Debug, PartialEq)]
 #[serde(default)]
@@ -9,8 +10,7 @@ pub struct FrontMatter {
     pub title: String,
     pub created: Option<DateTime<Utc>>,
     pub tags: HashSet<String>,
-    pub links_in: HashSet<String>,
-    pub links_out: HashSet<String>,
+    pub links: HashSet<PathBuf>,
 }
 
 impl FrontMatter {
@@ -19,8 +19,7 @@ impl FrontMatter {
             title: String::new(),
             created: Some(Utc::now()),
             tags: HashSet::new(),
-            links_in: HashSet::new(),
-            links_out: HashSet::new(),
+            links: HashSet::new(),
         }
     }
 
@@ -51,16 +50,21 @@ mod tests {
     }
 
     prop_compose! {
+        fn arb_path() (s in "[^\\p{C}\\p{Z}]*") -> PathBuf {
+            PathBuf::from(s)
+        }
+    }
+
+    prop_compose! {
         fn arb_front_matter() (
             // The regex here is all non-control, non-unicode-whitespace characters
             title in "[^\\p{C}\\p{Z}]*",
             date_time in arb_datetime(),
             tags in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
-            links_in in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
-            links_out in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
+            links in proptest::collection::hash_set(arb_path(), 3),
         ) -> FrontMatter {
             let created = Some(date_time);
-            FrontMatter { title, created, tags, links_in, links_out }
+            FrontMatter { title, created, tags, links }
         }
     }
 

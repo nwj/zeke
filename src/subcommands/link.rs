@@ -3,52 +3,56 @@ use clap::ArgMatches;
 use std::error::Error;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use std::path::PathBuf;
 
 pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
-    let from = match matches.value_of("FROM") {
-        Some(s) => s.to_string(),
+    let path_a = match matches.value_of("FILE_A") {
+        Some(s) => PathBuf::from(s),
         _ => unreachable!(),
     };
 
-    let to = match matches.value_of("TO") {
-        Some(s) => s.to_string(),
+    let path_b = match matches.value_of("FILE_B") {
+        Some(s) => PathBuf::from(s),
         _ => unreachable!(),
     };
 
-    let mut from_file_in = OpenOptions::new()
+    let mut file_a_in = OpenOptions::new()
         .read(true)
         .create_new(false)
-        .open(&from)?;
+        .open(&path_a)?;
 
-    let mut to_file_in = OpenOptions::new().read(true).create_new(false).open(&to)?;
+    let mut file_b_in = OpenOptions::new()
+        .read(true)
+        .create_new(false)
+        .open(&path_b)?;
 
-    let mut from_contents = String::new();
-    from_file_in.read_to_string(&mut from_contents)?;
+    let mut content_a = String::new();
+    file_a_in.read_to_string(&mut content_a)?;
 
-    let mut to_contents = String::new();
-    to_file_in.read_to_string(&mut to_contents)?;
+    let mut content_b = String::new();
+    file_b_in.read_to_string(&mut content_b)?;
 
-    let mut from_note = Note::from_string(from_contents)?;
-    let mut to_note = Note::from_string(to_contents)?;
+    let mut note_a = Note::from_string(content_a)?;
+    let mut note_b = Note::from_string(content_b)?;
 
-    if from_note.front_matter.links_out.insert(to.clone()) {
-        let mut from_file_out = OpenOptions::new()
+    if note_a.front_matter.links.insert(path_b.clone()) {
+        let mut file_a_out = OpenOptions::new()
             .write(true)
             .create_new(false)
             .truncate(true)
-            .open(&from)?;
-        from_file_out.write_all(from_note.to_string()?.as_bytes())?;
+            .open(&path_a)?;
+        file_a_out.write_all(note_a.to_string()?.as_bytes())?;
     }
 
-    if to_note.front_matter.links_in.insert(from.clone()) {
-        let mut to_file_out = OpenOptions::new()
+    if note_b.front_matter.links.insert(path_a.clone()) {
+        let mut file_b_out = OpenOptions::new()
             .write(true)
             .create_new(false)
             .truncate(true)
-            .open(&to)?;
-        to_file_out.write_all(to_note.to_string()?.as_bytes())?;
+            .open(&path_b)?;
+        file_b_out.write_all(note_b.to_string()?.as_bytes())?;
     }
 
-    println!("Linked `{}` to `{}`", &from, &to);
+    println!("Linked `{}` to `{}`", path_a.display(), path_b.display());
     Ok(())
 }

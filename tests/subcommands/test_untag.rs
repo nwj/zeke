@@ -15,8 +15,7 @@ title: Sint omnis et qui qui
 created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - {}
-links_in: []
-links_out: []
+links: []
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",
@@ -55,10 +54,8 @@ title: Sint omnis et qui qui
 created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - {}
-links_in:
+links:
   - b.md
-links_out:
-  - c.md
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",

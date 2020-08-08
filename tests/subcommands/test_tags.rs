@@ -15,8 +15,7 @@ created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - cats
   - zebras
-links_in: []
-links_out: []
+links: []
 --- ";
     let content2 = "---
 title: A
@@ -25,8 +24,7 @@ tags:
   - cats
   - dogs
   - monkeys
-links_in: []
-links_out: []
+links: []
 --- ";
 
     t.temp_dir.child(path1).write_str(content1)?;

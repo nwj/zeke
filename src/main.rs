@@ -27,14 +27,14 @@ fn main() {
             SubCommand::with_name("link")
                 .about("Link a note to another note")
                 .arg(
-                    Arg::with_name("FROM")
-                        .help("Path to the note to link from")
+                    Arg::with_name("FILE_A")
+                        .help("Path to one note to link")
                         .required(true)
                         .index(1),
                 )
                 .arg(
-                    Arg::with_name("TO")
-                        .help("Path to the note to link to")
+                    Arg::with_name("FILE_B")
+                        .help("Path to the other note to link")
                         .required(true)
                         .index(2),
                 ),
@@ -43,14 +43,14 @@ fn main() {
             SubCommand::with_name("unlink")
                 .about("Unlink a note from another note")
                 .arg(
-                    Arg::with_name("FROM")
-                        .help("Path to the note to unlink from")
+                    Arg::with_name("FILE_A")
+                        .help("Path to one note to unlink")
                         .required(true)
                         .index(1),
                 )
                 .arg(
-                    Arg::with_name("TO")
-                        .help("Path to the note to unlink to")
+                    Arg::with_name("FILE_B")
+                        .help("Path to the other note to unlink")
                         .required(true)
                         .index(2),
                 ),

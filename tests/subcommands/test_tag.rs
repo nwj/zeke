@@ -40,10 +40,8 @@ fn does_not_modify_other_file_content() -> Result<(), Box<dyn Error>> {
 title: Sint omnis et qui qui
 created: \"2020-04-19T18:23:24.774140Z\"
 tags: []
-links_in:
+links:
   - b.md
-links_out:
-  - c.md
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.";

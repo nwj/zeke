@@ -74,7 +74,7 @@ mod tests {
 
     #[test]
     fn from_string_no_content() -> Result<(), Box<dyn Error>> {
-        let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: \"2020-04-08T00:05:56.075997Z\"\ntags:\n  - cats\nlinks_in: []\nlinks_out: []\n---";
+        let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: \"2020-04-08T00:05:56.075997Z\"\ntags:\n  - cats\nlinks: []\n---";
         let a = Note::from_string(s.to_string())?;
         let mut ts = HashSet::new();
         ts.insert(String::from("cats"));
@@ -83,8 +83,7 @@ mod tests {
                 title: String::from("Lorem ipsum dolor sit amet"),
                 created: Some(Utc.ymd(2020, 4, 8).and_hms_micro(0, 5, 56, 75_997)),
                 tags: ts,
-                links_in: HashSet::new(),
-                links_out: HashSet::new(),
+                links: HashSet::new(),
             },
             content: String::new(),
         };
@@ -102,8 +101,7 @@ mod tests {
                 title: String::new(),
                 created: None,
                 tags: HashSet::new(),
-                links_in: HashSet::new(),
-                links_out: HashSet::new(),
+                links: HashSet::new(),
             },
             content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
         };
@@ -114,17 +112,16 @@ mod tests {
 
     #[test]
     fn from_string_partial_front_matter() -> Result<(), Box<dyn Error>> {
-        let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ntags: []\nlinks_in:\n  - cats.md\n---\nLorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem...";
+        let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ntags: []\nlinks:\n  - cats.md\n---\nLorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem...";
         let a = Note::from_string(s.to_string())?;
         let mut ls = HashSet::new();
-        ls.insert(String::from("cats.md"));
+        ls.insert(PathBuf::from("cats.md"));
         let b = Note {
             front_matter: FrontMatter {
                 title: String::from("Lorem ipsum dolor sit amet"),
                 created: None,
                 tags: HashSet::new(),
-                links_in: ls,
-                links_out: HashSet::new(),
+                links: ls,
             },
             content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
         };
@@ -140,12 +137,14 @@ mod tests {
                 title: String::from("This is a test"),
                 created: Some(Utc.ymd(2020, 4, 8).and_hms_micro(0, 5, 56, 75_997)),
                 tags: HashSet::new(),
-                links_in: HashSet::new(),
-                links_out: HashSet::new(),
+                links: HashSet::new(),
             },
             content: String::new(),
         };
-        assert_eq!(n.generate_path()?, PathBuf::from("20200408-this_is_a_test.md"));
+        assert_eq!(
+            n.generate_path()?,
+            PathBuf::from("20200408-this_is_a_test.md")
+        );
         Ok(())
     }
 
@@ -156,8 +155,7 @@ mod tests {
                 title: String::from("This is a test"),
                 created: None,
                 tags: HashSet::new(),
-                links_in: HashSet::new(),
-                links_out: HashSet::new(),
+                links: HashSet::new(),
             },
             content: String::new(),
         };
@@ -174,16 +172,21 @@ mod tests {
     }
 
     prop_compose! {
+        fn arb_path() (s in "[^\\p{C}\\p{Z}]*") -> PathBuf {
+            PathBuf::from(s)
+        }
+    }
+
+    prop_compose! {
         fn arb_front_matter() (
             // The regex here is all non-control, non-unicode-whitespace characters
             title in "[^\\p{C}\\p{Z}]*",
             date_time in arb_datetime(),
             tags in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
-            links_in in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
-            links_out in proptest::collection::hash_set("[^\\p{C}\\p{Z}]*", 3),
+            links in proptest::collection::hash_set(arb_path(), 3),
         ) -> FrontMatter {
             let created = Some(date_time);
-            FrontMatter { title, created, tags, links_in, links_out }
+            FrontMatter { title, created, tags, links }
         }
     }
 

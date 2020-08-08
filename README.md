@@ -15,8 +15,7 @@ $ cat 20200502-my_note.md
  title: My Note
  created: "2020-05-02T21:48:27.450966Z"
  tags: []
- links_in: []
- links_out: []
+ links: []
  ---
 ```
 
@@ -41,8 +40,7 @@ title: My Note
 created: "2020-05-02T22:06:27.479009Z"
 tags:
   - my-tag
-links_in: []
-links_out: []
+links: []
 ---
 ```
 Tags are recorded in the front-matter of notes.
@@ -57,8 +55,7 @@ $ cat one.md
 title: one
 created: "2020-05-02T22:24:35.253945Z"
 tags: []
-links_in: []
-links_out:
+links: []
   - two.md
 ---
 
@@ -67,12 +64,11 @@ $ cat two.md
 title: two
 created: "2020-05-02T22:24:38.706218Z"
 tags: []
-links_in:
+links:
   - one.md
-links_out: []
 ---
 ```
-Links are one-directional and are recorded in the front-matter of both notes.
+Links are bi-directional and are recorded in the front-matter of both notes.
 
 ## Installation
 
