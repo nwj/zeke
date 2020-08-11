@@ -3,10 +3,11 @@ use clap::ArgMatches;
 use std::error::Error;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use std::path::PathBuf;
 
 pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let path = match matches.value_of("FILE") {
-        Some(s) => s.to_string(),
+        Some(s) => PathBuf::from(s),
         _ => unreachable!(),
     };
 
@@ -35,6 +36,6 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         file_out.write_all(note.to_string()?.as_bytes())?;
     }
 
-    println!("Tagged `{}` with `{}`", &path, &tag);
+    println!("Tagged `{}` with `{}`", path.display(), &tag);
     Ok(())
 }
