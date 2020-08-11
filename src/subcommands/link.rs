@@ -16,24 +16,8 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         _ => unreachable!(),
     };
 
-    let mut file_a_in = OpenOptions::new()
-        .read(true)
-        .create_new(false)
-        .open(&path_a)?;
-
-    let mut file_b_in = OpenOptions::new()
-        .read(true)
-        .create_new(false)
-        .open(&path_b)?;
-
-    let mut content_a = String::new();
-    file_a_in.read_to_string(&mut content_a)?;
-
-    let mut content_b = String::new();
-    file_b_in.read_to_string(&mut content_b)?;
-
-    let mut note_a = Note::from_string(content_a)?;
-    let mut note_b = Note::from_string(content_b)?;
+    let mut note_a = Note::from_file(&path_a)?;
+    let mut note_b = Note::from_file(&path_b)?;
 
     if note_a.front_matter.links.insert(path_b.clone()) {
         let mut file_a_out = OpenOptions::new()

@@ -1,6 +1,8 @@
 use crate::front_matter::FrontMatter;
 use regex::Regex;
 use std::error::Error;
+use std::fs::OpenOptions;
+use std::io::prelude::*;
 use std::path::PathBuf;
 
 #[derive(Debug, PartialEq)]
@@ -25,12 +27,22 @@ impl Note {
         ))
     }
 
-    pub fn from_string(s: String) -> Result<Note, Box<dyn Error>> {
+    pub fn from_file(path: &PathBuf) -> Result<Note, Box<dyn Error>> {
+        let mut file = OpenOptions::new().read(true).create_new(false).open(path)?;
+
+        let mut file_content = String::new();
+        file.read_to_string(&mut file_content)?;
+
+        let (front_matter, content) = Note::from_string(file_content)?;
+        Ok(Note {
+            front_matter,
+            content,
+        })
+    }
+
+    fn from_string(s: String) -> Result<(FrontMatter, String), Box<dyn Error>> {
         if !s.starts_with("---\n") {
-            return Ok(Note {
-                front_matter: FrontMatter::default(),
-                content: s,
-            });
+            return Ok((FrontMatter::default(), s));
         }
 
         let splits: Vec<_> = s.splitn(3, "---").collect();
@@ -40,15 +52,9 @@ impl Note {
                 // strip_prefix is experimental right now, but could potentially replace
                 // trim_start_matches here if/when that changes
                 let content = c.trim_start_matches("\n").to_string();
-                Ok(Note {
-                    front_matter,
-                    content,
-                })
+                Ok((front_matter, content))
             }
-            _ => Ok(Note {
-                front_matter: FrontMatter::default(),
-                content: s,
-            }),
+            _ => Ok((FrontMatter::default(), s)),
         }
     }
 
@@ -75,7 +81,11 @@ mod tests {
     #[test]
     fn from_string_no_content() -> Result<(), Box<dyn Error>> {
         let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: \"2020-04-08T00:05:56.075997Z\"\ntags:\n  - cats\nlinks: []\n---";
-        let a = Note::from_string(s.to_string())?;
+        let (front_matter, content) = Note::from_string(s.to_string())?;
+        let a = Note {
+            front_matter,
+            content,
+        };
         let mut ts = HashSet::new();
         ts.insert(String::from("cats"));
         let b = Note {
@@ -95,7 +105,11 @@ mod tests {
     #[test]
     fn from_string_no_front_matter() -> Result<(), Box<dyn Error>> {
         let s = "Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem...";
-        let a = Note::from_string(s.to_string())?;
+        let (front_matter, content) = Note::from_string(s.to_string())?;
+        let a = Note {
+            front_matter,
+            content,
+        };
         let b = Note {
             front_matter: FrontMatter {
                 title: String::new(),
@@ -113,7 +127,11 @@ mod tests {
     #[test]
     fn from_string_partial_front_matter() -> Result<(), Box<dyn Error>> {
         let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ntags: []\nlinks:\n  - cats.md\n---\nLorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem...";
-        let a = Note::from_string(s.to_string())?;
+        let (front_matter, content) = Note::from_string(s.to_string())?;
+        let a = Note {
+            front_matter,
+            content,
+        };
         let mut ls = HashSet::new();
         ls.insert(PathBuf::from("cats.md"));
         let b = Note {
@@ -202,8 +220,10 @@ mod tests {
     proptest! {
         #[test]
         fn proptest_to_then_from_string (n in arb_note()) {
-            let converted_n = Note::from_string(n.to_string().unwrap()).unwrap();
-            assert_eq!(n, converted_n)
+            let s = n.to_string().unwrap();
+            let (front_matter, content) = Note::from_string(s).unwrap();
+            let n2 = Note {front_matter, content};
+            assert_eq!(n, n2)
         }
     }
 }

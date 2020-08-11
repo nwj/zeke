@@ -16,15 +16,7 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         _ => unreachable!(),
     };
 
-    let mut file_in = OpenOptions::new()
-        .read(true)
-        .create_new(false)
-        .open(&path)?;
-
-    let mut file_contents = String::new();
-    file_in.read_to_string(&mut file_contents)?;
-
-    let mut note = Note::from_string(file_contents)?;
+    let mut note = Note::from_file(&path)?;
 
     if note.front_matter.tags.remove(&tag) {
         let mut file_out = OpenOptions::new()
