@@ -3,12 +3,15 @@ use regex::Regex;
 use std::error::Error;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use std::io::Error as IOError;
+use std::io::ErrorKind as IOErrorKind;
 use std::path::PathBuf;
 
 #[derive(Debug, PartialEq)]
 pub struct Note {
     pub front_matter: FrontMatter,
     content: String,
+    pub path: Option<PathBuf>,
 }
 
 impl Note {
@@ -16,19 +19,33 @@ impl Note {
         Note {
             front_matter: FrontMatter::new(),
             content: String::new(),
+            path: None,
         }
     }
 
-    pub fn to_string(&self) -> Result<String, Box<dyn Error>> {
-        Ok(format!(
-            "{}\n{}",
-            self.front_matter.to_yaml_string()?,
-            self.content
-        ))
+    pub fn write_to_file(&self, create_new: bool) -> Result<(), Box<dyn Error>> {
+        let path = self.path.as_ref().ok_or_else(|| {
+            IOError::new(
+                IOErrorKind::NotFound,
+                "Cannot write note as it does not have a corresponding path.",
+            )
+        })?;
+
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(create_new)
+            .truncate(true)
+            .open(&path)?;
+
+        file.write_all(self.to_string()?.as_bytes())?;
+        Ok(())
     }
 
-    pub fn from_file(path: &PathBuf) -> Result<Note, Box<dyn Error>> {
-        let mut file = OpenOptions::new().read(true).create_new(false).open(path)?;
+    pub fn read_from_file(path: &PathBuf) -> Result<Note, Box<dyn Error>> {
+        let mut file = OpenOptions::new()
+            .read(true)
+            .create_new(false)
+            .open(&path)?;
 
         let mut file_content = String::new();
         file.read_to_string(&mut file_content)?;
@@ -37,25 +54,8 @@ impl Note {
         Ok(Note {
             front_matter,
             content,
+            path: Some(path.clone()),
         })
-    }
-
-    fn from_string(s: String) -> Result<(FrontMatter, String), Box<dyn Error>> {
-        if !s.starts_with("---\n") {
-            return Ok((FrontMatter::default(), s));
-        }
-
-        let splits: Vec<_> = s.splitn(3, "---").collect();
-        match (splits.get(1), splits.get(2)) {
-            (Some(fm), Some(c)) => {
-                let front_matter = FrontMatter::from_yaml_string(format!("---{}", fm))?;
-                // strip_prefix is experimental right now, but could potentially replace
-                // trim_start_matches here if/when that changes
-                let content = c.trim_start_matches("\n").to_string();
-                Ok((front_matter, content))
-            }
-            _ => Ok((FrontMatter::default(), s)),
-        }
     }
 
     pub fn generate_path(&self) -> Result<PathBuf, Box<dyn Error>> {
@@ -67,6 +67,30 @@ impl Note {
             None => format!("{}.md", title_part),
         };
         Ok(PathBuf::from(path_string))
+    }
+
+    fn to_string(&self) -> Result<String, Box<dyn Error>> {
+        Ok(format!(
+            "{}\n{}",
+            self.front_matter.to_yaml_string()?,
+            self.content
+        ))
+    }
+
+    fn from_string(s: String) -> Result<(FrontMatter, String), Box<dyn Error>> {
+        if !s.starts_with("---\n") {
+            return Ok((FrontMatter::default(), s));
+        }
+
+        let splits: Vec<_> = s.splitn(3, "---").collect();
+        match (splits.get(1), splits.get(2)) {
+            (Some(fm), Some(c)) => {
+                let front_matter = FrontMatter::from_yaml_string(format!("---{}", fm))?;
+                let content = c.trim_start_matches("\n").to_string();
+                Ok((front_matter, content))
+            }
+            _ => Ok((FrontMatter::default(), s)),
+        }
     }
 }
 
@@ -85,6 +109,7 @@ mod tests {
         let a = Note {
             front_matter,
             content,
+            path: None,
         };
         let mut ts = HashSet::new();
         ts.insert(String::from("cats"));
@@ -96,6 +121,7 @@ mod tests {
                 links: HashSet::new(),
             },
             content: String::new(),
+            path: None,
         };
 
         assert_eq!(a, b);
@@ -109,6 +135,7 @@ mod tests {
         let a = Note {
             front_matter,
             content,
+            path: None,
         };
         let b = Note {
             front_matter: FrontMatter {
@@ -118,6 +145,7 @@ mod tests {
                 links: HashSet::new(),
             },
             content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
+            path: None,
         };
 
         assert_eq!(a, b);
@@ -131,6 +159,7 @@ mod tests {
         let a = Note {
             front_matter,
             content,
+            path: None,
         };
         let mut ls = HashSet::new();
         ls.insert(PathBuf::from("cats.md"));
@@ -142,6 +171,7 @@ mod tests {
                 links: ls,
             },
             content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
+            path: None,
         };
 
         assert_eq!(a, b);
@@ -158,6 +188,7 @@ mod tests {
                 links: HashSet::new(),
             },
             content: String::new(),
+            path: None,
         };
         assert_eq!(
             n.generate_path()?,
@@ -176,6 +207,7 @@ mod tests {
                 links: HashSet::new(),
             },
             content: String::new(),
+            path: None,
         };
         assert_eq!(n.generate_path()?, PathBuf::from("this_is_a_test.md"));
         Ok(())
@@ -212,8 +244,10 @@ mod tests {
         fn arb_note() (
             front_matter in arb_front_matter(),
             content in "\\PC*",
+            path in arb_path(),
         ) -> Note {
-            Note { front_matter, content }
+            let path = Some(path);
+            Note { front_matter, content, path }
         }
     }
 
@@ -222,8 +256,9 @@ mod tests {
         fn proptest_to_then_from_string (n in arb_note()) {
             let s = n.to_string().unwrap();
             let (front_matter, content) = Note::from_string(s).unwrap();
-            let n2 = Note {front_matter, content};
-            assert_eq!(n, n2)
+            let n2 = Note {front_matter, content, path: None};
+            assert_eq!(n.front_matter, n2.front_matter);
+            assert_eq!(n.content, n2.content);
         }
     }
 }

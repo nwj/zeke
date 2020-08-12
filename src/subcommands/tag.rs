@@ -1,8 +1,6 @@
 use crate::note::Note;
 use clap::ArgMatches;
 use std::error::Error;
-use std::fs::OpenOptions;
-use std::io::prelude::*;
 use std::path::PathBuf;
 
 pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
@@ -16,16 +14,10 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         _ => unreachable!(),
     };
 
-    let mut note = Note::from_file(&path)?;
+    let mut note = Note::read_from_file(&path)?;
 
     if note.front_matter.tags.insert(tag.clone()) {
-        let mut file_out = OpenOptions::new()
-            .write(true)
-            .create_new(false)
-            .truncate(true)
-            .open(&path)?;
-
-        file_out.write_all(note.to_string()?.as_bytes())?;
+        note.write_to_file(false)?;
     }
 
     println!("Tagged `{}` with `{}`", path.display(), &tag);

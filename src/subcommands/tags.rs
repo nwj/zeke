@@ -13,7 +13,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
             continue;
         }
 
-        match Note::from_file(&path) {
+        match Note::read_from_file(&path) {
             Ok(n) => {
                 for tag in n.front_matter.tags {
                     tags.insert(tag);
