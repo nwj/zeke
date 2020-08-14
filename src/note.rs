@@ -10,7 +10,7 @@ use std::path::PathBuf;
 #[derive(Debug, PartialEq)]
 pub struct Note {
     pub front_matter: FrontMatter,
-    content: String,
+    pub content: String,
     pub path: Option<PathBuf>,
 }
 

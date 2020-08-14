@@ -91,9 +91,12 @@ fn main() {
                         .index(2),
                 ),
         )
+        .subcommand(
+            SubCommand::with_name("graph")
+                .about("Generate a representation of the links between all notes in the DOT format")
+        )
         .subcommand(SubCommand::with_name("ls").about("List all notes that meet various criteria"))
         .subcommand(SubCommand::with_name("backlink").about("Add backlinks to the front matter of all notes"))
-        .subcommand(SubCommand::with_name("graph").about("Generate a graphviz-compatible representation of the links between all notes"))
         .subcommand(SubCommand::with_name("mv").about("Retitle a note and update any references to the old title"))
         .get_matches();
 

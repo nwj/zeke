@@ -54,4 +54,10 @@ impl ZekeTester {
         cmd.arg("untag").arg(path).arg(tag);
         Ok(cmd)
     }
+
+    pub fn zeke_graph(&self) -> Result<Command, Box<dyn Error>> {
+        let mut cmd = self.zeke()?;
+        cmd.arg("graph");
+        Ok(cmd)
+    }
 }
