@@ -9,10 +9,6 @@ pub fn run() -> Result<(), Box<dyn Error>> {
     for entry in fs::read_dir(".")? {
         let path = entry?.path();
 
-        if path.is_dir() {
-            continue;
-        }
-
         match Note::read_from_file(&path) {
             Ok(n) => {
                 for tag in n.front_matter.tags {

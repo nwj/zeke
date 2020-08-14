@@ -38,7 +38,7 @@ links: []
 }
 
 #[test]
-fn skips_over_directories() -> Result<(), Box<dyn Error>> {
+fn does_not_panic_on_directories() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
     t.temp_dir.child("subdir").create_dir_all()?;
 
