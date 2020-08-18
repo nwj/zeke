@@ -1,5 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_yaml::Value;
+use std::collections::HashMap;
 use std::collections::HashSet;
 use std::error::Error;
 use std::path::PathBuf;
@@ -11,6 +13,8 @@ pub struct FrontMatter {
     pub created: Option<DateTime<Utc>>,
     pub tags: HashSet<String>,
     pub links: HashSet<PathBuf>,
+    #[serde(flatten)]
+    pub extra: HashMap<String, Value>,
 }
 
 impl FrontMatter {
@@ -20,6 +24,7 @@ impl FrontMatter {
             created: Some(Utc::now()),
             tags: HashSet::new(),
             links: HashSet::new(),
+            extra: HashMap::new(),
         }
     }
 
@@ -64,7 +69,8 @@ mod tests {
             links in proptest::collection::hash_set(arb_path(), 3),
         ) -> FrontMatter {
             let created = Some(date_time);
-            FrontMatter { title, created, tags, links }
+            let extra = HashMap::new();
+            FrontMatter { title, created, tags, links, extra }
         }
     }
 

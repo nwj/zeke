@@ -56,6 +56,7 @@ tags:
   - {}
 links:
   - b.md
+color: purple
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",

@@ -94,6 +94,7 @@ tags:
   - quisquam
 links:
   - {}
+foo: 12345
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.",

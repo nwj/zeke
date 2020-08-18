@@ -72,6 +72,10 @@ created: \"2020-04-19T18:23:24.774140Z\"
 tags:
   - quisquam
 links: []
+foobar:
+  - foo
+  - 123
+  - false
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.";

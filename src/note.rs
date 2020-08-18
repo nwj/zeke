@@ -116,6 +116,7 @@ mod tests {
     use chrono::offset::TimeZone;
     use chrono::{DateTime, Utc};
     use proptest::prelude::*;
+    use std::collections::HashMap;
     use std::collections::HashSet;
 
     #[test]
@@ -135,6 +136,7 @@ mod tests {
                 created: Some(Utc.ymd(2020, 4, 8).and_hms_micro(0, 5, 56, 75_997)),
                 tags: ts,
                 links: HashSet::new(),
+                extra: HashMap::new(),
             },
             content: String::new(),
             path: None,
@@ -159,6 +161,7 @@ mod tests {
                 created: None,
                 tags: HashSet::new(),
                 links: HashSet::new(),
+                extra: HashMap::new(),
             },
             content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
             path: None,
@@ -185,6 +188,7 @@ mod tests {
                 created: None,
                 tags: HashSet::new(),
                 links: ls,
+                extra: HashMap::new(),
             },
             content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
             path: None,
@@ -202,6 +206,7 @@ mod tests {
                 created: Some(Utc.ymd(2020, 4, 8).and_hms_micro(0, 5, 56, 75_997)),
                 tags: HashSet::new(),
                 links: HashSet::new(),
+                extra: HashMap::new(),
             },
             content: String::new(),
             path: None,
@@ -221,6 +226,7 @@ mod tests {
                 created: None,
                 tags: HashSet::new(),
                 links: HashSet::new(),
+                extra: HashMap::new(),
             },
             content: String::new(),
             path: None,
@@ -277,7 +283,8 @@ mod tests {
             links in proptest::collection::hash_set(arb_path(), 3),
         ) -> FrontMatter {
             let created = Some(date_time);
-            FrontMatter { title, created, tags, links }
+            let extra = HashMap::new();
+            FrontMatter { title, created, tags, links, extra }
         }
     }
 

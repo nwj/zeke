@@ -42,6 +42,7 @@ created: \"2020-04-19T18:23:24.774140Z\"
 tags: []
 links:
   - b.md
+foo: bar
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.";
