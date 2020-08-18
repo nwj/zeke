@@ -1,5 +1,7 @@
 # Unreleased
 
+# v0.3.1
+
 ## Features
 
 - Introduced the `graph` command, which graphs the links between notes and outputs a representation of that graph in the DOT format.
