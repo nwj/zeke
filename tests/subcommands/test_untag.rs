@@ -23,9 +23,41 @@ Esse cumque saepe laboriosam.",
     );
     t.temp_dir.child(path).write_str(&content)?;
 
-    t.zeke_untag(path, tag)?.assert().success();
+    t.zeke_untag(tag, path)?.assert().success();
     t.temp_dir
         .child(path)
+        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)).not());
+
+    Ok(())
+}
+
+#[test]
+fn can_untag_multiple_notes() -> Result<(), Box<dyn Error>> {
+    let t = ZekeTester::new();
+    let path = "note.md";
+    let path2 = "note2.md";
+    let tag = "cats";
+    let content = format!(
+        "---
+title: Sint omnis et qui qui
+created: \"2020-04-19T18:23:24.774140Z\"
+tags:
+  - {}
+links: []
+---
+Perspiciatis dolores corrupti sit.
+Esse cumque saepe laboriosam.",
+        tag
+    );
+    t.temp_dir.child(path).write_str(&content)?;
+    t.temp_dir.child(path2).write_str(&content)?;
+
+    t.zeke_untag(tag, path)?.arg(path2).assert().success();
+    t.temp_dir
+        .child(path)
+        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)).not());
+    t.temp_dir
+        .child(path2)
         .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)).not());
 
     Ok(())
@@ -37,7 +69,7 @@ fn fails_without_extant_file() -> Result<(), Box<dyn Error>> {
     let path = "note.md";
     let tag = "cats";
 
-    t.zeke_untag(path, tag)?.assert().failure();
+    t.zeke_untag(tag, path)?.assert().failure();
     t.temp_dir.child(path).assert(predicate::path::missing());
 
     Ok(())
@@ -64,7 +96,7 @@ Esse cumque saepe laboriosam.",
     );
     t.temp_dir.child(path).write_str(&content)?;
 
-    t.zeke_untag(path, tag)?.assert().success();
+    t.zeke_untag(tag, path)?.assert().success();
     t.temp_dir
         .child(path)
         .assert(content.replace(&format!("tags:\n  - {}", tag), "tags: []"));

@@ -11,9 +11,29 @@ fn tags_the_note() -> Result<(), Box<dyn Error>> {
     let tag = "cats";
     t.temp_dir.child(path).touch()?;
 
-    t.zeke_tag(path, tag)?.assert().success();
+    t.zeke_tag(tag, path)?.assert().success();
     t.temp_dir
         .child(path)
+        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)));
+
+    Ok(())
+}
+
+#[test]
+fn can_tag_multiple_notes() -> Result<(), Box<dyn Error>> {
+    let t = ZekeTester::new();
+    let path = "note.md";
+    let path2 = "note2.md";
+    let tag = "dogs";
+    t.temp_dir.child(path).touch()?;
+    t.temp_dir.child(path2).touch()?;
+
+    t.zeke_tag(tag, path)?.arg(path2).assert().success();
+    t.temp_dir
+        .child(path)
+        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)));
+    t.temp_dir
+        .child(path2)
         .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)));
 
     Ok(())
@@ -25,7 +45,7 @@ fn fails_without_extant_file() -> Result<(), Box<dyn Error>> {
     let path = "note.md";
     let tag = "cats";
 
-    t.zeke_tag(path, tag)?.assert().failure();
+    t.zeke_tag(tag, path)?.assert().failure();
     t.temp_dir.child(path).assert(predicate::path::missing());
 
     Ok(())
@@ -49,7 +69,7 @@ Esse cumque saepe laboriosam.";
 
     t.temp_dir.child(path).write_str(content)?;
 
-    t.zeke_tag(path, tag)?.assert().success();
+    t.zeke_tag(tag, path)?.assert().success();
     t.temp_dir
         .child(path)
         .assert(content.replace("tags: []", &format!("tags:\n  - {}", tag)));
@@ -64,8 +84,8 @@ fn idempotent_if_tagged_repeatedly() -> Result<(), Box<dyn Error>> {
     let tag = "cats";
     t.temp_dir.child(path).touch()?;
 
-    t.zeke_tag(path, tag)?.assert().success();
-    t.zeke_tag(path, tag)?.assert().success();
+    t.zeke_tag(tag, path)?.assert().success();
+    t.zeke_tag(tag, path)?.assert().success();
     t.temp_dir
         .child(path)
         .assert(predicate::str::contains(tag).count(1));

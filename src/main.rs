@@ -61,33 +61,35 @@ fn main() {
         )
         .subcommand(
             SubCommand::with_name("tag")
-                .about("Tag a note")
+                .about("Tag one or more notes")
                 .arg(
-                    Arg::with_name("FILE")
-                        .help("Path to the note to tag")
+                    Arg::with_name("TAG")
+                        .help("Tag to apply to the note(s)")
                         .required(true)
                         .index(1),
                 )
                 .arg(
-                    Arg::with_name("TAG")
-                        .help("Tag to apply to the note")
+                    Arg::with_name("FILE")
+                        .help("Path(s) for the note(s) to tag")
                         .required(true)
+                        .multiple(true)
                         .index(2),
                 ),
         )
         .subcommand(
             SubCommand::with_name("untag")
-                .about("Remove a tag from a note")
+                .about("Remove a tag from one or more notes")
                 .arg(
-                    Arg::with_name("FILE")
-                        .help("Path to the note to untag")
+                    Arg::with_name("TAG")
+                        .help("Tag to remove from the note(s)")
                         .required(true)
                         .index(1),
                 )
                 .arg(
-                    Arg::with_name("TAG")
-                        .help("Tag to remove from the note")
+                    Arg::with_name("FILE")
+                        .help("Path(s) for the note(s) to untag")
                         .required(true)
+                        .multiple(true)
                         .index(2),
                 ),
         )
