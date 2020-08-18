@@ -1,6 +1,10 @@
 use crate::front_matter::FrontMatter;
+use pulldown_cmark::Event as MarkdownParseEvent;
+use pulldown_cmark::Parser as MarkdownParser;
+use pulldown_cmark::Tag as MarkdownTag;
 use regex::Regex;
 use std::error::Error;
+use std::ffi::OsStr;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::io::Error as IOError;
@@ -67,6 +71,18 @@ impl Note {
             None => format!("{}.md", title_part),
         };
         Ok(PathBuf::from(path_string))
+    }
+
+    fn _parse_note_links_from_content(&self) -> Vec<PathBuf> {
+        MarkdownParser::new(&self.content)
+            .filter_map(|event| match event {
+                MarkdownParseEvent::Start(MarkdownTag::Link(_, l, _)) => {
+                    Some(PathBuf::from(l.into_string()))
+                }
+                _ => None,
+            })
+            .filter(|path| matches!(path.extension().and_then(OsStr::to_str), Some("md")))
+            .collect()
     }
 
     fn to_string(&self) -> Result<String, Box<dyn Error>> {
@@ -210,6 +226,31 @@ mod tests {
             path: None,
         };
         assert_eq!(n.generate_path()?, PathBuf::from("this_is_a_test.md"));
+        Ok(())
+    }
+
+    #[test]
+    fn parse_note_links_from_content() -> Result<(), Box<dyn Error>> {
+        let content = String::from("This is a [message](one.md) with [some](two.md) [note](two.md) [links](https://www.google.com).");
+        let n = Note {
+            front_matter: FrontMatter {
+                title: String::new(),
+                created: None,
+                tags: HashSet::new(),
+                links: HashSet::new(),
+                extra: HashMap::new(),
+            },
+            content: content,
+            path: None,
+        };
+        assert_eq!(
+            n._parse_note_links_from_content(),
+            vec!(
+                PathBuf::from("one.md"),
+                PathBuf::from("two.md"),
+                PathBuf::from("two.md")
+            )
+        );
         Ok(())
     }
 
