@@ -14,14 +14,14 @@ fn main() {
                     Arg::with_name("TITLE")
                         .help("Title for the new note")
                         .required(true)
-                        .index(1),
+                        .index(1)
                 )
                 .arg(
                     Arg::with_name("edit")
                         .short("e")
                         .help("Opens the new note in the editor specified by the $ZEKE_EDITOR env variable")
-                        .long("edit"),
-                ),
+                        .long("edit")
+                )
         )
         .subcommand(
             SubCommand::with_name("link")
@@ -30,14 +30,14 @@ fn main() {
                     Arg::with_name("FILE_A")
                         .help("Path to one note to link")
                         .required(true)
-                        .index(1),
+                        .index(1)
                 )
                 .arg(
                     Arg::with_name("FILE_B")
                         .help("Path to the other note to link")
                         .required(true)
-                        .index(2),
-                ),
+                        .index(2)
+                )
         )
         .subcommand(
             SubCommand::with_name("unlink")
@@ -46,14 +46,14 @@ fn main() {
                     Arg::with_name("FILE_A")
                         .help("Path to one note to unlink")
                         .required(true)
-                        .index(1),
+                        .index(1)
                 )
                 .arg(
                     Arg::with_name("FILE_B")
                         .help("Path to the other note to unlink")
                         .required(true)
-                        .index(2),
-                ),
+                        .index(2)
+                )
         )
         .subcommand(
             SubCommand::with_name("tags")
@@ -66,15 +66,15 @@ fn main() {
                     Arg::with_name("TAG")
                         .help("Tag to apply to the note(s)")
                         .required(true)
-                        .index(1),
+                        .index(1)
                 )
                 .arg(
                     Arg::with_name("FILE")
                         .help("Path(s) for the note(s) to tag")
                         .required(true)
                         .multiple(true)
-                        .index(2),
-                ),
+                        .index(2)
+                )
         )
         .subcommand(
             SubCommand::with_name("untag")
@@ -83,23 +83,38 @@ fn main() {
                     Arg::with_name("TAG")
                         .help("Tag to remove from the note(s)")
                         .required(true)
-                        .index(1),
+                        .index(1)
                 )
                 .arg(
                     Arg::with_name("FILE")
                         .help("Path(s) for the note(s) to untag")
                         .required(true)
                         .multiple(true)
-                        .index(2),
-                ),
+                        .index(2)
+                )
         )
         .subcommand(
             SubCommand::with_name("graph")
                 .about("Generate a representation of the links between all notes in the DOT format")
         )
+        .subcommand(
+            SubCommand::with_name("mv")
+                .about("Rename a note and update references to the old name")
+                .arg(
+                    Arg::with_name("FILE")
+                        .help("Path to the note to move")
+                        .required(true)
+                        .index(1)
+                )
+                .arg(
+                    Arg::with_name("TITLE")
+                        .help("New title for the note")
+                        .required(true)
+                        .index(2)
+                )
+        )
         .subcommand(SubCommand::with_name("ls").about("List all notes that meet various criteria"))
         .subcommand(SubCommand::with_name("backlink").about("Add backlinks to the front matter of all notes"))
-        .subcommand(SubCommand::with_name("mv").about("Retitle a note and update any references to the old title"))
         .get_matches();
 
     if let Err(e) = zeke::run(&matches) {

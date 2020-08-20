@@ -60,4 +60,10 @@ impl ZekeTester {
         cmd.arg("graph");
         Ok(cmd)
     }
+
+    pub fn zeke_mv(&self, path: &str, title: &str) -> Result<Command, Box<dyn Error>> {
+        let mut cmd = self.zeke()?;
+        cmd.arg("mv").arg(path).arg(title);
+        Ok(cmd)
+    }
 }

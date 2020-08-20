@@ -13,10 +13,10 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
         ("tags", Some(_)) => subcommands::tags::run(),
         ("tag", Some(m)) => subcommands::tag::run(m),
         ("untag", Some(m)) => subcommands::untag::run(m),
+        ("mv", Some(m)) => subcommands::mv::run(m),
         ("ls", Some(m)) => subcommands::ls::run(m),
         ("backlink", Some(m)) => subcommands::backlink::run(m),
         ("graph", Some(_)) => subcommands::graph::run(),
-        ("mv", Some(m)) => subcommands::mv::run(m),
         _ => Ok(()),
     }
 }
