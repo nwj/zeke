@@ -10,7 +10,7 @@ Zeke aims to augment these technologies by automating some of the more manual or
 
 ## Usage
 
-### Create a new note
+### Creating Notes
 
 ```
 $ zeke new "My Note"
@@ -27,17 +27,16 @@ $ cat 20200502-my_note.md
 
 Notes are markdown files, named using a date and a formatted version of the note title. Each note includes YAML front-matter with basic meta-data.
 
-### Create a new note and open it in a text editor
+The optional `-e` flag will open the new note in whichever editor you specify using the `ZEKE_EDITOR` environment variable.
 
 ```
 $ export ZEKE_EDITOR="vim"
 $ zeke new -e "My Note"
 ```
-The `-e` flag will open the new note in whichever editor you specify using the `ZEKE_EDITOR` environment variable.
 
-### Tag a note
+### Tagging Notes
 ```
-$ zeke tag 20200502-my_note.md my-tag
+$ zeke tag my-tag 20200502-my_note.md
 Tagged `20200502-my_note.md` with `my-tag`
 
 $ cat 20200502-my_note.md
@@ -49,9 +48,27 @@ tags:
 links: []
 ---
 ```
+
 Tags are recorded in the front-matter of notes.
 
-### Link two notes
+You can untag notes in a similar manner:
+
+```
+$ zeke untag my-tag 20200502-my_note.md
+Untagged `20200502-my_note.md` from `my-tag`
+```
+
+You can also generate a simple list of all the tags in your notes:
+
+```
+$ zeke tags
+my-tag
+another-tag
+yet-another-tag
+```
+
+### Linking Notes
+
 ```
 $ zeke link one.md two.md
 Linked `one.md` to `two.md`
@@ -74,7 +91,20 @@ links:
   - one.md
 ---
 ```
-Links are bi-directional and are recorded in the front-matter of both notes.
+
+Links are recorded in the front-matter of both notes.
+
+Unlinking notes works in a similar manner:
+
+```
+$ zeke unlink one.md two.md
+```
+
+A representation of the network of links between your notes is available via the `graph` command. The output is in the DOT format, which can be used by GraphViz to generate charts.
+
+```
+$ zeke graph | dot -Tsvg > graph.svg
+```
 
 ## Installation
 
