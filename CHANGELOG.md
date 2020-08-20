@@ -1,10 +1,11 @@
 # Unreleased
 
-- Introduced the `mv` command, which renames a note file and also updates any links that reference the old file name in the front-matter of other notes.
+# v0.4.0
 
 ## Features
 
 - __[Breaking Change]__ The `tag` and `untag` command now support tagging/untagging of multiple files - e.g. `tag <your tag> <file1> <file2> ...` is now possible. This is a breaking change because the order of the tag and file arguments on these commands has swapped.
+- Introduced the `mv` command, which renames a note file and also updates any links that reference the old file name in the front-matter of other notes.
 
 # v0.3.1
 
