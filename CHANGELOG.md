@@ -1,5 +1,9 @@
 # Unreleased
 
+## Bug Fixes
+
+`unlink` and `graph` now recognize links like `./foo.md`, and `bar/../foo.md` as equivalent to `foo.md` and will act on those links accordingly.
+
 # v0.4.0
 
 ## Features
