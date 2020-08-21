@@ -52,6 +52,39 @@ links:
 }
 
 #[test]
+fn works_with_uncleaned_paths() -> Result<(), Box<dyn Error>> {
+    let t = ZekeTester::new();
+    let path1 = "a.md";
+    let path2 = "b.md";
+    let content1 = "---
+title: A
+created: \"2020-04-19T18:23:24.774140Z\"
+tags: []
+links:
+  - ./b.md
+--- ";
+    let content2 = "---
+title: B
+created: \"2020-04-19T18:23:24.774140Z\"
+tags: []
+links:
+  - /foo/../a.md
+--- ";
+
+    t.temp_dir.child(path1).write_str(content1)?;
+    t.temp_dir.child(path2).write_str(content2)?;
+
+    t.zeke_graph()?
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("[ label = \"A\" ]\n"))
+        .stdout(predicate::str::contains("[ label = \"B\" ]\n"))
+        .stdout(predicate::str::contains("1 -- 0 [ label = \"\" ]\n"));
+
+    Ok(())
+}
+
+#[test]
 fn does_not_panic_on_directories() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
     t.temp_dir.child("subdir").create_dir_all()?;

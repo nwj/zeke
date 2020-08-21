@@ -1,16 +1,17 @@
 use crate::note::Note;
 use clap::ArgMatches;
+use path_clean::PathClean;
 use std::error::Error;
 use std::path::PathBuf;
 
 pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let path_a = match matches.value_of("FILE_A") {
-        Some(s) => PathBuf::from(s),
+        Some(s) => PathBuf::from(s).clean(),
         _ => unreachable!(),
     };
 
     let path_b = match matches.value_of("FILE_B") {
-        Some(s) => PathBuf::from(s),
+        Some(s) => PathBuf::from(s).clean(),
         _ => unreachable!(),
     };
 

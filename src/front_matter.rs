@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use path_clean::PathClean;
 use serde::{Deserialize, Serialize};
 use serde_yaml::Value;
 use std::collections::HashMap;
@@ -35,7 +36,8 @@ impl FrontMatter {
 
     pub fn from_yaml_string(s: String) -> Result<FrontMatter, Box<dyn Error>> {
         let trimmed = s.trim_end().trim_end_matches("---").trim_end();
-        let front_matter = serde_yaml::from_str(&trimmed)?;
+        let mut front_matter: FrontMatter = serde_yaml::from_str(&trimmed)?;
+        front_matter.links = front_matter.links.iter().map(|l| l.clean()).collect();
         Ok(front_matter)
     }
 }
@@ -45,6 +47,19 @@ mod tests {
     use super::*;
     use chrono::offset::TimeZone;
     use proptest::prelude::*;
+
+    #[test]
+    fn from_yaml_string_cleans_link_paths() -> Result<(), Box<dyn Error>> {
+        let yaml = String::from("---\nlinks:\n  - ./bar.md\n  - test/../foo.md\n---\n");
+        let fm1 = FrontMatter::from_yaml_string(yaml)?;
+        let mut fm2 = FrontMatter::new();
+        fm2.created = None;
+        fm2.links.insert(PathBuf::from("bar.md"));
+        fm2.links.insert(PathBuf::from("foo.md"));
+        assert_eq!(fm1, fm2);
+
+        Ok(())
+    }
 
     prop_compose! {
         // The dates here are 1900-01-01 to 2200-01-01. Limited to this range because chrono panics
@@ -56,7 +71,7 @@ mod tests {
 
     prop_compose! {
         fn arb_path() (s in "[^\\p{C}\\p{Z}]*") -> PathBuf {
-            PathBuf::from(s)
+            PathBuf::from(s).clean()
         }
     }
 

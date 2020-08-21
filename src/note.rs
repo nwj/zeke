@@ -115,6 +115,7 @@ mod tests {
     use super::*;
     use chrono::offset::TimeZone;
     use chrono::{DateTime, Utc};
+    use path_clean::PathClean;
     use proptest::prelude::*;
     use std::collections::HashMap;
     use std::collections::HashSet;
@@ -270,7 +271,7 @@ mod tests {
 
     prop_compose! {
         fn arb_path() (s in "[^\\p{C}\\p{Z}]*") -> PathBuf {
-            PathBuf::from(s)
+            PathBuf::from(s).clean()
         }
     }
 
