@@ -1,5 +1,9 @@
 # Unreleased
 
+## Features
+
+`new` and `mv` now strip punctuation from a note's title when generating the file name for a note.
+
 ## Bug Fixes
 
 `unlink` and `graph` now recognize links like `./foo.md`, and `bar/../foo.md` as equivalent to `foo.md` and will act on those links accordingly.

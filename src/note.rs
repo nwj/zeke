@@ -63,9 +63,9 @@ impl Note {
     }
 
     pub fn generate_path(&self) -> Result<PathBuf, Box<dyn Error>> {
-        let title_part = Regex::new(r"\s")?
-            .replace_all(&self.front_matter.title, "_")
-            .to_lowercase();
+        let punctuation_stripped = Regex::new(r"[[:punct:]]")?.replace_all(&self.front_matter.title, "");
+        let spaces_replaced = Regex::new(r"\s")?.replace_all(&punctuation_stripped, "_");
+        let title_part = spaces_replaced.to_lowercase();
         let path_string = match self.front_matter.created {
             Some(ts) => format!("{}-{}.md", ts.format("%Y%m%d"), title_part),
             None => format!("{}.md", title_part),
@@ -233,6 +233,23 @@ mod tests {
             path: None,
         };
         assert_eq!(n.generate_path()?, PathBuf::from("this_is_a_test.md"));
+        Ok(())
+    }
+
+    #[test]
+    fn generate_path_strips_punctuation() -> Result<(), Box<dyn Error>> {
+        let n = Note {
+            front_matter: FrontMatter {
+                title: String::from("Does this work, y'all?"),
+                created: None,
+                tags: HashSet::new(),
+                links: HashSet::new(),
+                extra: HashMap::new(),
+            },
+            content: String::new(),
+            path: None,
+        };
+        assert_eq!(n.generate_path()?, PathBuf::from("does_this_work_yall.md"));
         Ok(())
     }
 
