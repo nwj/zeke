@@ -1,4 +1,5 @@
 use crate::note::Note;
+use crate::content::Content;
 use path_clean::PathClean;
 use petgraph::dot::Dot;
 use petgraph::graph::UnGraph;
@@ -15,7 +16,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
         match Note::read_from_file(&entry?.path().clean()) {
             Ok(mut note) => {
                 // We don't reference note content here, so there's no reason to keep it in memory
-                note.content = String::new();
+                note.content = Content::new();
                 notes.push(note);
             }
             Err(_) => continue,

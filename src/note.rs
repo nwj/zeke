@@ -1,10 +1,7 @@
 use crate::front_matter::FrontMatter;
-use pulldown_cmark::Event as MarkdownParseEvent;
-use pulldown_cmark::Parser as MarkdownParser;
-use pulldown_cmark::Tag as MarkdownTag;
+use crate::content::Content;
 use regex::Regex;
 use std::error::Error;
-use std::ffi::OsStr;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::io::Error as IOError;
@@ -14,7 +11,7 @@ use std::path::PathBuf;
 #[derive(Debug, PartialEq)]
 pub struct Note {
     pub front_matter: FrontMatter,
-    pub content: String,
+    pub content: Content,
     pub path: Option<PathBuf>,
 }
 
@@ -22,7 +19,7 @@ impl Note {
     pub fn new() -> Note {
         Note {
             front_matter: FrontMatter::new(),
-            content: String::new(),
+            content: Content::new(),
             path: None,
         }
     }
@@ -73,18 +70,6 @@ impl Note {
         Ok(PathBuf::from(path_string))
     }
 
-    fn _parse_note_links_from_content(&self) -> Vec<PathBuf> {
-        MarkdownParser::new(&self.content)
-            .filter_map(|event| match event {
-                MarkdownParseEvent::Start(MarkdownTag::Link(_, l, _)) => {
-                    Some(PathBuf::from(l.into_string()))
-                }
-                _ => None,
-            })
-            .filter(|path| matches!(path.extension().and_then(OsStr::to_str), Some("md")))
-            .collect()
-    }
-
     fn to_string(&self) -> Result<String, Box<dyn Error>> {
         Ok(format!(
             "{}\n{}",
@@ -93,19 +78,19 @@ impl Note {
         ))
     }
 
-    fn from_string(s: String) -> Result<(FrontMatter, String), Box<dyn Error>> {
+    fn from_string(s: String) -> Result<(FrontMatter, Content), Box<dyn Error>> {
         if !s.starts_with("---\n") {
-            return Ok((FrontMatter::default(), s));
+            return Ok((FrontMatter::default(), Content::from(s)));
         }
 
         let splits: Vec<_> = s.splitn(3, "---").collect();
         match (splits.get(1), splits.get(2)) {
             (Some(fm), Some(c)) => {
                 let front_matter = FrontMatter::from_yaml_string(format!("---{}", fm))?;
-                let content = c.trim_start_matches("\n").to_string();
+                let content = Content::from(c.trim_start_matches("\n"));
                 Ok((front_matter, content))
             }
-            _ => Ok((FrontMatter::default(), s)),
+            _ => Ok((FrontMatter::default(), Content::from(s))),
         }
     }
 }
@@ -139,7 +124,7 @@ mod tests {
                 links: HashSet::new(),
                 extra: HashMap::new(),
             },
-            content: String::new(),
+            content: Content::new(),
             path: None,
         };
 
@@ -164,7 +149,7 @@ mod tests {
                 links: HashSet::new(),
                 extra: HashMap::new(),
             },
-            content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
+            content: Content::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
             path: None,
         };
 
@@ -191,7 +176,7 @@ mod tests {
                 links: ls,
                 extra: HashMap::new(),
             },
-            content: String::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
+            content: Content::from("Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem..."),
             path: None,
         };
 
@@ -209,7 +194,7 @@ mod tests {
                 links: HashSet::new(),
                 extra: HashMap::new(),
             },
-            content: String::new(),
+            content: Content::new(),
             path: None,
         };
         assert_eq!(
@@ -229,7 +214,7 @@ mod tests {
                 links: HashSet::new(),
                 extra: HashMap::new(),
             },
-            content: String::new(),
+            content: Content::new(),
             path: None,
         };
         assert_eq!(n.generate_path()?, PathBuf::from("this_is_a_test.md"));
@@ -246,35 +231,10 @@ mod tests {
                 links: HashSet::new(),
                 extra: HashMap::new(),
             },
-            content: String::new(),
+            content: Content::new(),
             path: None,
         };
         assert_eq!(n.generate_path()?, PathBuf::from("does_this_work_yall.md"));
-        Ok(())
-    }
-
-    #[test]
-    fn parse_note_links_from_content() -> Result<(), Box<dyn Error>> {
-        let content = String::from("This is a [message](one.md) with [some](two.md) [note](two.md) [links](https://www.google.com).");
-        let n = Note {
-            front_matter: FrontMatter {
-                title: String::new(),
-                created: None,
-                tags: HashSet::new(),
-                links: HashSet::new(),
-                extra: HashMap::new(),
-            },
-            content: content,
-            path: None,
-        };
-        assert_eq!(
-            n._parse_note_links_from_content(),
-            vec!(
-                PathBuf::from("one.md"),
-                PathBuf::from("two.md"),
-                PathBuf::from("two.md")
-            )
-        );
         Ok(())
     }
 
@@ -307,9 +267,17 @@ mod tests {
     }
 
     prop_compose! {
+        fn arb_content() (
+            s in "\\PC*",
+        ) -> Content {
+            Content::from(s)
+        }
+    }
+
+    prop_compose! {
         fn arb_note() (
             front_matter in arb_front_matter(),
-            content in "\\PC*",
+            content in arb_content(),
             path in arb_path(),
         ) -> Note {
             let path = Some(path);

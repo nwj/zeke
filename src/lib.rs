@@ -1,6 +1,7 @@
 use clap::ArgMatches;
 use std::error::Error;
 
+mod content;
 mod front_matter;
 mod note;
 mod subcommands;
