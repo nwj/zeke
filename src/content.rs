@@ -18,7 +18,7 @@ impl Content {
         Content(String::new())
     }
 
-    fn _replace_note_links<P: AsRef<Path>>(
+    pub fn replace_note_links<P: AsRef<Path>>(
         &self,
         from: &P,
         to: &P,
@@ -26,12 +26,12 @@ impl Content {
         let from_ref = from.as_ref();
         let to_ref = to.as_ref();
 
-        if !self._has_note_link(&from_ref) {
+        if !self.has_note_link(&from_ref) {
             return Ok(Content::from(self.0.clone()));
         }
 
         let mut s = String::with_capacity(&self.0.len() + 128);
-        let md = self._markdown_parser().map(|event| match event.clone() {
+        let md = self.markdown_parser().map(|event| match event.clone() {
             MarkdownEvent::Start(MarkdownTag::Link(link_type, url, title)) => {
                 if PathBuf::from(url.into_string()).clean() == from_ref {
                     MarkdownEvent::Start(MarkdownTag::Link(
@@ -60,12 +60,12 @@ impl Content {
         Ok(Content::from(s))
     }
 
-    fn _markdown_parser(&self) -> MarkdownParser {
+    fn markdown_parser(&self) -> MarkdownParser {
         MarkdownParser::new(&self.0)
     }
 
-    fn _has_note_link<P: AsRef<Path>>(&self, target: &P) -> bool {
-        for event in self._markdown_parser() {
+    fn has_note_link<P: AsRef<Path>>(&self, target: &P) -> bool {
+        for event in self.markdown_parser() {
             if let MarkdownEvent::Start(MarkdownTag::Link(_, url, _)) = event {
                 if PathBuf::from(url.into_string()).clean() == target.as_ref() {
                     return true;
@@ -77,7 +77,7 @@ impl Content {
     }
 
     fn _get_note_links(&self) -> Vec<PathBuf> {
-        self._markdown_parser()
+        self.markdown_parser()
             .filter_map(|event| match event {
                 MarkdownEvent::Start(MarkdownTag::Link(_, url, _)) => {
                     Some(PathBuf::from(url.into_string()).clean())
@@ -115,7 +115,7 @@ mod tests {
     fn replace_note_links() -> Result<(), Box<dyn Error>> {
         let content = Content::from("This is a [message](one.md) with [some](two.md) [note](two.md) [links](https://www.google.com).");
         assert_eq!(
-            content._replace_note_links(&Path::new("two.md"), &Path::new("three.md"))?,
+            content.replace_note_links(&Path::new("two.md"), &Path::new("three.md"))?,
             Content::from("This is a [message](one.md) with [some](three.md) [note](three.md) [links](https://www.google.com).")
         );
         Ok(())
@@ -125,7 +125,7 @@ mod tests {
     fn replace_note_links_doesnt_modify_content_if_no_link() -> Result<(), Box<dyn Error>> {
         let content = Content::from("This is a [message](one.md) with [some](two.md) [note](two.md) [links](https://www.google.com).");
         assert_eq!(
-            content._replace_note_links(&Path::new("garbage.md"), &Path::new("more_garbage.md"))?,
+            content.replace_note_links(&Path::new("garbage.md"), &Path::new("more_garbage.md"))?,
             content
         );
         Ok(())
@@ -134,8 +134,8 @@ mod tests {
     #[test]
     fn has_note_link() -> Result<(), Box<dyn Error>> {
         let content = Content::from("This is a [message](./one.md) with [some](two.md) [note](catdog.md) [links](https://www.google.com).");
-        assert!(content._has_note_link(&"one.md"));
-        assert!(!content._has_note_link(&"dog.md"));
+        assert!(content.has_note_link(&"one.md"));
+        assert!(!content.has_note_link(&"dog.md"));
         Ok(())
     }
 

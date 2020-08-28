@@ -25,8 +25,20 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     for entry in fs::read_dir(".")? {
         let p = entry?.path();
         let mut n = Note::read_from_file(&p)?;
+        let mut should_write = false;
+
         if n.front_matter.links.remove(&old_path) {
             n.front_matter.links.insert(new_path.clone());
+            should_write = true;
+        }
+
+        let new_content = n.content.replace_note_links(&old_path, &new_path)?;
+        if new_content != n.content {
+            n.content = new_content;
+            should_write = true;
+        }
+
+        if should_write {
             n.write_to_file(false)?;
         }
     }

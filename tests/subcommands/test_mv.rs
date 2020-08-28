@@ -85,7 +85,7 @@ Esse cumque saepe laboriosam.";
 }
 
 #[test]
-fn updates_front_matter_of_linked_notes() -> Result<(), Box<dyn Error>> {
+fn updates_front_matter_linked_notes() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
     let path_a = "a.md";
     let path_b = "b.md";
@@ -114,7 +114,35 @@ Esse cumque saepe laboriosam.",
 }
 
 #[test]
-fn does_not_modify_other_content_of_linked_notes() -> Result<(), Box<dyn Error>> {
+fn updates_content_linked_notes() -> Result<(), Box<dyn Error>> {
+    let t = ZekeTester::new();
+    let path_a = "a.md";
+    let path_b = "b.md";
+    let content_b = format!(
+        "---
+title: B
+created: \"2020-08-19T18:23:24.774140Z\"
+tags: []
+links: []
+---
+Perspiciatis dolores [corrupti]({}) sit.
+Esse cumque saepe laboriosam.",
+        path_a
+    );
+    t.temp_dir.child(path_a).touch()?;
+    t.temp_dir.child(path_b).write_str(&content_b)?;
+
+    t.zeke_mv(path_a, "C")?.assert().success();
+    t.temp_dir
+        .child(path_b)
+        .assert(predicate::str::contains(format!("[corrupti]({})", path_a,)).not())
+        .assert(predicate::str::contains("[corrupti](c.md)"));
+
+    Ok(())
+}
+
+#[test]
+fn does_not_modify_other_aspects_of_linked_notes() -> Result<(), Box<dyn Error>> {
     let t = ZekeTester::new();
     let path_a = "a.md";
     let path_b = "b.md";
