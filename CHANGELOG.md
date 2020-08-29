@@ -1,5 +1,7 @@
 # Unreleased
 
+# v0.4.1
+
 ## Features
 
 - `new` and `mv` now strip punctuation from a note's title when generating the file name for a note.
