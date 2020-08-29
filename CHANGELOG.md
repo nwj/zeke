@@ -1,5 +1,7 @@
 # Unreleased
 
+# v0.4.2
+
 ## Features
 
 - Introduced the `backlink` command, which adds a reference to the `links` field in a note's front-matter for every other note that references it.
