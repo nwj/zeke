@@ -1,11 +1,15 @@
 # Unreleased
 
+## Features
+
+- Introduced the `backlink` command, which adds a reference to the `links` field in a note's front-matter for every other note that references it.
+
 # v0.4.1
 
 ## Features
 
-- `new` and `mv` now strip punctuation from a note's title when generating the file name for a note.
-- `mv` now updates links in the markdown of other notes that reference the note that is being moved. Previously it only updated references in the `links` field of note front-matter.
+- Modified `new` and `mv` so that they strip punctuation from a note's title when generating the file name for a note.
+- Modified `mv` so that it updates links in the markdown of other notes that reference the note that is being moved. Previously it only updated references in the `links` field of note front-matter.
 - `graph` now considers links in the markdown of notes in the graph that it constructs. Previously it only looked at the `links` field in the front-matter of notes.
 
 ## Bug Fixes
@@ -16,7 +20,7 @@
 
 ## Features
 
-- __[Breaking Change]__ The `tag` and `untag` command now support tagging/untagging of multiple files - e.g. `tag <your tag> <file1> <file2> ...` is now possible. This is a breaking change because the order of the tag and file arguments on these commands has swapped.
+- **[Breaking Change]** The `tag` and `untag` command now support tagging/untagging of multiple files - e.g. `tag <your tag> <file1> <file2> ...` is now possible. This is a breaking change because the order of the tag and file arguments on these commands has swapped.
 - Introduced the `mv` command, which renames a note file and also updates any links that reference the old file name in the front-matter of other notes.
 
 # v0.3.1
@@ -30,7 +34,7 @@
 
 ## Features
 
-- __[Breaking Change]__ Changed the linking system from a directed system to an undirected system. This means that the `links_in` and `links_out` fields in note front-matter are no longer recognized and instead there is a single `links` field.
+- **[Breaking Change]** Changed the linking system from a directed system to an undirected system. This means that the `links_in` and `links_out` fields in note front-matter are no longer recognized and instead there is a single `links` field.
 
 # v0.2.1
 

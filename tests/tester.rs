@@ -66,4 +66,10 @@ impl ZekeTester {
         cmd.arg("mv").arg(path).arg(title);
         Ok(cmd)
     }
+
+    pub fn zeke_backlink(&self) -> Result<Command, Box<dyn Error>> {
+        let mut cmd = self.zeke()?;
+        cmd.arg("backlink");
+        Ok(cmd)
+    }
 }
