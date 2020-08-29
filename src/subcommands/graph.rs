@@ -1,5 +1,4 @@
 use crate::note::Note;
-use crate::content::Content;
 use path_clean::PathClean;
 use petgraph::dot::Dot;
 use petgraph::graph::UnGraph;
@@ -14,9 +13,7 @@ pub fn run() -> Result<(), Box<dyn Error>> {
 
     for entry in fs::read_dir(".")? {
         match Note::read_from_file(&entry?.path().clean()) {
-            Ok(mut note) => {
-                // We don't reference note content here, so there's no reason to keep it in memory
-                note.content = Content::new();
+            Ok(note) => {
                 notes.push(note);
             }
             Err(_) => continue,
@@ -32,7 +29,16 @@ pub fn run() -> Result<(), Box<dyn Error>> {
 
     for note in notes.iter() {
         let node_a = paths_to_nodes.get(&note.path.as_ref().unwrap()).unwrap();
+
         for path in note.front_matter.links.iter() {
+            let node_b = match paths_to_nodes.get(path) {
+                Some(node) => node,
+                None => continue,
+            };
+            graph.update_edge(*node_a, *node_b, "");
+        }
+
+        for path in note.content.get_note_links().iter() {
             let node_b = match paths_to_nodes.get(path) {
                 Some(node) => node,
                 None => continue,

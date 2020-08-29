@@ -60,6 +60,18 @@ impl Content {
         Ok(Content::from(s))
     }
 
+    pub fn get_note_links(&self) -> Vec<PathBuf> {
+        self.markdown_parser()
+            .filter_map(|event| match event {
+                MarkdownEvent::Start(MarkdownTag::Link(_, url, _)) => {
+                    Some(PathBuf::from(url.into_string()).clean())
+                }
+                _ => None,
+            })
+            .filter(|path| matches!(path.extension().and_then(OsStr::to_str), Some("md")))
+            .collect()
+    }
+
     fn markdown_parser(&self) -> MarkdownParser {
         MarkdownParser::new(&self.0)
     }
@@ -74,18 +86,6 @@ impl Content {
         }
 
         false
-    }
-
-    fn _get_note_links(&self) -> Vec<PathBuf> {
-        self.markdown_parser()
-            .filter_map(|event| match event {
-                MarkdownEvent::Start(MarkdownTag::Link(_, url, _)) => {
-                    Some(PathBuf::from(url.into_string()).clean())
-                }
-                _ => None,
-            })
-            .filter(|path| matches!(path.extension().and_then(OsStr::to_str), Some("md")))
-            .collect()
     }
 }
 
@@ -143,7 +143,7 @@ mod tests {
     fn get_note_links() -> Result<(), Box<dyn Error>> {
         let content = Content::from("This is a [message](one.md) with [some](two.md) [note](two.md) [links](https://www.google.com).");
         assert_eq!(
-            content._get_note_links(),
+            content.get_note_links(),
             vec!(
                 PathBuf::from("one.md"),
                 PathBuf::from("two.md"),

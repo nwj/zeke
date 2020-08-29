@@ -2,11 +2,13 @@
 
 ## Features
 
-`new` and `mv` now strip punctuation from a note's title when generating the file name for a note.
+- `new` and `mv` now strip punctuation from a note's title when generating the file name for a note.
+- `mv` now updates links in the markdown of other notes that reference the note that is being moved. Previously it only updated references in the `links` field of note front-matter.
+- `graph` now considers links in the markdown of notes in the graph that it constructs. Previously it only looked at the `links` field in the front-matter of notes.
 
 ## Bug Fixes
 
-`unlink` and `graph` now recognize links like `./foo.md`, and `bar/../foo.md` as equivalent to `foo.md` and will act on those links accordingly.
+- `unlink` and `graph` now recognize links like `./foo.md`, and `bar/../foo.md` as equivalent to `foo.md` and will act on those links accordingly.
 
 # v0.4.0
 
