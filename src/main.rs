@@ -117,7 +117,6 @@ fn main() {
             SubCommand::with_name("backlink")
                 .about("Add backlinks to the front matter of all notes")
         )
-        .subcommand(SubCommand::with_name("ls").about("List all notes that meet various criteria"))
         .get_matches();
 
     if let Err(e) = zeke::run(&matches) {
