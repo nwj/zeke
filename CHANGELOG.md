@@ -1,5 +1,7 @@
 # Unreleased
 
+# v0.5.1
+
 ## Bug Fixes
 
 - `mv` should no longer panic if it encounters a directory or fails to parse a file while checking other notes for references to the target note.
