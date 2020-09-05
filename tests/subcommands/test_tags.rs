@@ -1,11 +1,11 @@
 use crate::tester::ZekeTester;
+use anyhow::Result;
 use assert_cmd::prelude::*;
 use assert_fs::prelude::*;
-use std::error::Error;
 use std::str;
 
 #[test]
-fn lists_tags() -> Result<(), Box<dyn Error>> {
+fn lists_tags() -> Result<()> {
     let t = ZekeTester::new();
     let path1 = "a.md";
     let path2 = "b.md";
@@ -38,7 +38,7 @@ links: []
 }
 
 #[test]
-fn does_not_panic_on_directories() -> Result<(), Box<dyn Error>> {
+fn does_not_panic_on_directories() -> Result<()> {
     let t = ZekeTester::new();
     t.temp_dir.child("subdir").create_dir_all()?;
 

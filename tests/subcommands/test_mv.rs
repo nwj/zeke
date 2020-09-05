@@ -1,11 +1,11 @@
 use crate::tester::ZekeTester;
+use anyhow::Result;
 use assert_cmd::prelude::*;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
-use std::error::Error;
 
 #[test]
-fn renames_note() -> Result<(), Box<dyn Error>> {
+fn renames_note() -> Result<()> {
     let t = ZekeTester::new();
     let old_path = "20200819-foo.md";
     let content = "---
@@ -32,7 +32,7 @@ links: []
 }
 
 #[test]
-fn updates_note_title() -> Result<(), Box<dyn Error>> {
+fn updates_note_title() -> Result<()> {
     let t = ZekeTester::new();
     let old_path = "20200819-foo.md";
     let content = "---
@@ -56,7 +56,7 @@ links: []
 }
 
 #[test]
-fn does_not_modify_other_content_of_the_moved_note() -> Result<(), Box<dyn Error>> {
+fn does_not_modify_other_content_of_the_moved_note() -> Result<()> {
     let t = ZekeTester::new();
     let path = "a.md";
     let content = "---
@@ -85,7 +85,7 @@ Esse cumque saepe laboriosam.";
 }
 
 #[test]
-fn updates_front_matter_linked_notes() -> Result<(), Box<dyn Error>> {
+fn updates_front_matter_linked_notes() -> Result<()> {
     let t = ZekeTester::new();
     let path_a = "a.md";
     let path_b = "b.md";
@@ -114,7 +114,7 @@ Esse cumque saepe laboriosam.",
 }
 
 #[test]
-fn updates_content_linked_notes() -> Result<(), Box<dyn Error>> {
+fn updates_content_linked_notes() -> Result<()> {
     let t = ZekeTester::new();
     let path_a = "a.md";
     let path_b = "b.md";
@@ -142,7 +142,7 @@ Esse cumque saepe laboriosam.",
 }
 
 #[test]
-fn does_not_modify_other_aspects_of_linked_notes() -> Result<(), Box<dyn Error>> {
+fn does_not_modify_other_aspects_of_linked_notes() -> Result<()> {
     let t = ZekeTester::new();
     let path_a = "a.md";
     let path_b = "b.md";

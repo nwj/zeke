@@ -1,7 +1,7 @@
-use crate::front_matter::FrontMatter;
 use crate::content::Content;
+use crate::front_matter::FrontMatter;
+use anyhow::Result;
 use regex::Regex;
-use std::error::Error;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::io::Error as IOError;
@@ -24,7 +24,7 @@ impl Note {
         }
     }
 
-    pub fn write_to_file(&self, create_new: bool) -> Result<(), Box<dyn Error>> {
+    pub fn write_to_file(&self, create_new: bool) -> Result<()> {
         let path = self.path.as_ref().ok_or_else(|| {
             IOError::new(
                 IOErrorKind::NotFound,
@@ -42,7 +42,7 @@ impl Note {
         Ok(())
     }
 
-    pub fn read_from_file(path: &PathBuf) -> Result<Note, Box<dyn Error>> {
+    pub fn read_from_file(path: &PathBuf) -> Result<Note> {
         let mut file = OpenOptions::new()
             .read(true)
             .create_new(false)
@@ -59,8 +59,9 @@ impl Note {
         })
     }
 
-    pub fn generate_path(&self) -> Result<PathBuf, Box<dyn Error>> {
-        let punctuation_stripped = Regex::new(r"[[:punct:]]")?.replace_all(&self.front_matter.title, "");
+    pub fn generate_path(&self) -> Result<PathBuf> {
+        let punctuation_stripped =
+            Regex::new(r"[[:punct:]]")?.replace_all(&self.front_matter.title, "");
         let spaces_replaced = Regex::new(r"\s")?.replace_all(&punctuation_stripped, "_");
         let title_part = spaces_replaced.to_lowercase();
         let path_string = match self.front_matter.created {
@@ -70,7 +71,7 @@ impl Note {
         Ok(PathBuf::from(path_string))
     }
 
-    fn to_string(&self) -> Result<String, Box<dyn Error>> {
+    fn to_string(&self) -> Result<String> {
         Ok(format!(
             "{}\n{}",
             self.front_matter.to_yaml_string()?,
@@ -78,7 +79,7 @@ impl Note {
         ))
     }
 
-    fn from_string(s: String) -> Result<(FrontMatter, Content), Box<dyn Error>> {
+    fn from_string(s: String) -> Result<(FrontMatter, Content)> {
         if !s.starts_with("---\n") {
             return Ok((FrontMatter::default(), Content::from(s)));
         }
@@ -106,7 +107,7 @@ mod tests {
     use std::collections::HashSet;
 
     #[test]
-    fn from_string_no_content() -> Result<(), Box<dyn Error>> {
+    fn from_string_no_content() -> Result<()> {
         let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: \"2020-04-08T00:05:56.075997Z\"\ntags:\n  - cats\nlinks: []\n---";
         let (front_matter, content) = Note::from_string(s.to_string())?;
         let a = Note {
@@ -133,7 +134,7 @@ mod tests {
     }
 
     #[test]
-    fn from_string_no_front_matter() -> Result<(), Box<dyn Error>> {
+    fn from_string_no_front_matter() -> Result<()> {
         let s = "Lorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem...";
         let (front_matter, content) = Note::from_string(s.to_string())?;
         let a = Note {
@@ -158,7 +159,7 @@ mod tests {
     }
 
     #[test]
-    fn from_string_partial_front_matter() -> Result<(), Box<dyn Error>> {
+    fn from_string_partial_front_matter() -> Result<()> {
         let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ntags: []\nlinks:\n  - cats.md\n---\nLorem ipsum dolir sit amet\nSed ut perspiciatis unde omnis iste natus error sit voluptatem...";
         let (front_matter, content) = Note::from_string(s.to_string())?;
         let a = Note {
@@ -185,7 +186,7 @@ mod tests {
     }
 
     #[test]
-    fn generate_path() -> Result<(), Box<dyn Error>> {
+    fn generate_path() -> Result<()> {
         let n = Note {
             front_matter: FrontMatter {
                 title: String::from("This is a test"),
@@ -205,7 +206,7 @@ mod tests {
     }
 
     #[test]
-    fn generate_path_no_created_date() -> Result<(), Box<dyn Error>> {
+    fn generate_path_no_created_date() -> Result<()> {
         let n = Note {
             front_matter: FrontMatter {
                 title: String::from("This is a test"),
@@ -222,7 +223,7 @@ mod tests {
     }
 
     #[test]
-    fn generate_path_strips_punctuation() -> Result<(), Box<dyn Error>> {
+    fn generate_path_strips_punctuation() -> Result<()> {
         let n = Note {
             front_matter: FrontMatter {
                 title: String::from("Does this work, y'all?"),

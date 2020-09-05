@@ -1,10 +1,10 @@
+use anyhow::Result;
 use chrono::{DateTime, Utc};
 use path_clean::PathClean;
 use serde::{Deserialize, Serialize};
 use serde_yaml::Value;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::error::Error;
 use std::path::PathBuf;
 
 #[derive(Serialize, Deserialize, Default, Debug, PartialEq)]
@@ -29,12 +29,12 @@ impl FrontMatter {
         }
     }
 
-    pub fn to_yaml_string(&self) -> Result<String, Box<dyn Error>> {
+    pub fn to_yaml_string(&self) -> Result<String> {
         let yaml = serde_yaml::to_string(&self)?;
         Ok(format!("{}\n---", yaml))
     }
 
-    pub fn from_yaml_string(s: String) -> Result<FrontMatter, Box<dyn Error>> {
+    pub fn from_yaml_string(s: String) -> Result<FrontMatter> {
         let trimmed = s.trim_end().trim_end_matches("---").trim_end();
         let mut front_matter: FrontMatter = serde_yaml::from_str(&trimmed)?;
         front_matter.links = front_matter.links.iter().map(|l| l.clean()).collect();
@@ -49,7 +49,7 @@ mod tests {
     use proptest::prelude::*;
 
     #[test]
-    fn from_yaml_string_cleans_link_paths() -> Result<(), Box<dyn Error>> {
+    fn from_yaml_string_cleans_link_paths() -> Result<()> {
         let yaml = String::from("---\nlinks:\n  - ./bar.md\n  - test/../foo.md\n---\n");
         let fm1 = FrontMatter::from_yaml_string(yaml)?;
         let mut fm2 = FrontMatter::new();

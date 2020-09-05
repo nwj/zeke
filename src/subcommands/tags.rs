@@ -1,9 +1,9 @@
 use crate::note::Note;
+use anyhow::Result;
 use std::collections::BTreeSet;
-use std::error::Error;
 use std::fs;
 
-pub fn run() -> Result<(), Box<dyn Error>> {
+pub fn run() -> Result<()> {
     let mut tags: BTreeSet<String> = BTreeSet::new();
 
     for entry in fs::read_dir(".")? {

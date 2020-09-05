@@ -1,9 +1,9 @@
 use crate::note::Note;
+use anyhow::Result;
 use path_clean::PathClean;
-use std::error::Error;
 use std::fs;
 
-pub fn run() -> Result<(), Box<dyn Error>> {
+pub fn run() -> Result<()> {
     for entry in fs::read_dir(".")? {
         let note = match Note::read_from_file(&entry?.path()) {
             Ok(n) => n,

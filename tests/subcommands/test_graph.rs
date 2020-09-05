@@ -1,11 +1,11 @@
 use crate::tester::ZekeTester;
+use anyhow::Result;
 use assert_cmd::prelude::*;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
-use std::error::Error;
 
 #[test]
-fn formats_note_graph_in_dot_format() -> Result<(), Box<dyn Error>> {
+fn formats_note_graph_in_dot_format() -> Result<()> {
     let t = ZekeTester::new();
     let path1 = "a.md";
     let path2 = "b.md";
@@ -52,7 +52,7 @@ links:
 }
 
 #[test]
-fn includes_links_from_content_in_the_graph() -> Result<(), Box<dyn Error>> {
+fn includes_links_from_content_in_the_graph() -> Result<()> {
     let t = ZekeTester::new();
     let path1 = "a.md";
     let path2 = "b.md";
@@ -82,7 +82,7 @@ links: []
 }
 
 #[test]
-fn works_with_uncleaned_paths() -> Result<(), Box<dyn Error>> {
+fn works_with_uncleaned_paths() -> Result<()> {
     let t = ZekeTester::new();
     let path1 = "a.md";
     let path2 = "b.md";
@@ -115,7 +115,7 @@ links:
 }
 
 #[test]
-fn does_not_panic_on_directories() -> Result<(), Box<dyn Error>> {
+fn does_not_panic_on_directories() -> Result<()> {
     let t = ZekeTester::new();
     t.temp_dir.child("subdir").create_dir_all()?;
     t.zeke_graph()?.assert().success();

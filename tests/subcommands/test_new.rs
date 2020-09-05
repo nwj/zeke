@@ -1,14 +1,14 @@
 use crate::tester::ZekeTester;
+use anyhow::Result;
 use assert_cmd::prelude::*;
 use assert_fs::prelude::*;
 use chrono::Utc;
 use predicates::prelude::*;
 use regex::Regex;
-use std::error::Error;
 use std::str;
 
 #[test]
-fn creates_note() -> Result<(), Box<dyn Error>> {
+fn creates_note() -> Result<()> {
     let t = ZekeTester::new();
 
     let output = t.zeke_new("Cats dogs")?.output()?;
@@ -26,7 +26,7 @@ fn creates_note() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn does_not_overwrite_existing_files() -> Result<(), Box<dyn Error>> {
+fn does_not_overwrite_existing_files() -> Result<()> {
     let t = ZekeTester::new();
     let title = "foo";
     // This will be a source of test flakiness if the test is run right as the date changes, but meh
@@ -41,11 +41,15 @@ fn does_not_overwrite_existing_files() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn spawns_editor_process_if_edit_flag() -> Result<(), Box<dyn Error>> {
+fn spawns_editor_process_if_edit_flag() -> Result<()> {
     let t = ZekeTester::new();
     let title = "foo";
 
-    let output = t.zeke_new(title)?.arg("-e").env("ZEKE_EDITOR", "echo").output()?;
+    let output = t
+        .zeke_new(title)?
+        .arg("-e")
+        .env("ZEKE_EDITOR", "echo")
+        .output()?;
     let stdout = str::from_utf8(&output.stdout)?;
     assert_eq!(stdout.matches(title).count(), 2);
 
@@ -53,7 +57,7 @@ fn spawns_editor_process_if_edit_flag() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn fails_gracefully_if_edit_flag_but_no_editor() -> Result<(), Box<dyn Error>> {
+fn fails_gracefully_if_edit_flag_but_no_editor() -> Result<()> {
     let t = ZekeTester::new();
     t.zeke_new("bar")?.arg("-e").env_clear().assert().failure();
 

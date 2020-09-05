@@ -1,12 +1,12 @@
+use anyhow::Result;
 use clap::ArgMatches;
-use std::error::Error;
 
 mod content;
 mod front_matter;
 mod note;
 mod subcommands;
 
-pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
+pub fn run(matches: &ArgMatches) -> Result<()> {
     match matches.subcommand() {
         ("new", Some(m)) => subcommands::new::run(m),
         ("link", Some(m)) => subcommands::link::run(m),

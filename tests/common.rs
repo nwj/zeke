@@ -1,13 +1,13 @@
 use crate::tester::ZekeTester;
+use anyhow::Result;
 use assert_cmd::prelude::*;
 use predicates::prelude::*;
-use std::error::Error;
 
 mod subcommands;
 mod tester;
 
 #[test]
-fn without_args() -> Result<(), Box<dyn Error>> {
+fn without_args() -> Result<()> {
     let t = ZekeTester::new();
 
     t.zeke()?

@@ -1,11 +1,11 @@
 use crate::tester::ZekeTester;
+use anyhow::Result;
 use assert_cmd::prelude::*;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
-use std::error::Error;
 
 #[test]
-fn tags_the_note() -> Result<(), Box<dyn Error>> {
+fn tags_the_note() -> Result<()> {
     let t = ZekeTester::new();
     let path = "note.md";
     let tag = "cats";
@@ -20,7 +20,7 @@ fn tags_the_note() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn can_tag_multiple_notes() -> Result<(), Box<dyn Error>> {
+fn can_tag_multiple_notes() -> Result<()> {
     let t = ZekeTester::new();
     let path = "note.md";
     let path2 = "note2.md";
@@ -40,7 +40,7 @@ fn can_tag_multiple_notes() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn fails_without_extant_file() -> Result<(), Box<dyn Error>> {
+fn fails_without_extant_file() -> Result<()> {
     let t = ZekeTester::new();
     let path = "note.md";
     let tag = "cats";
@@ -52,7 +52,7 @@ fn fails_without_extant_file() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn does_not_modify_other_file_content() -> Result<(), Box<dyn Error>> {
+fn does_not_modify_other_file_content() -> Result<()> {
     let t = ZekeTester::new();
     let path = "a.md";
     let tag = "dogs";
@@ -78,7 +78,7 @@ Esse cumque saepe laboriosam.";
 }
 
 #[test]
-fn idempotent_if_tagged_repeatedly() -> Result<(), Box<dyn Error>> {
+fn idempotent_if_tagged_repeatedly() -> Result<()> {
     let t = ZekeTester::new();
     let path = "note.md";
     let tag = "cats";

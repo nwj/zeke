@@ -1,12 +1,12 @@
 use crate::note::Note;
+use anyhow::Result;
 use path_clean::PathClean;
 use petgraph::dot::Dot;
 use petgraph::graph::UnGraph;
 use std::collections::HashMap;
-use std::error::Error;
 use std::fs;
 
-pub fn run() -> Result<(), Box<dyn Error>> {
+pub fn run() -> Result<()> {
     let mut graph = UnGraph::<&str, &str>::new_undirected();
     let mut notes = Vec::new();
     let mut paths_to_nodes = HashMap::new();

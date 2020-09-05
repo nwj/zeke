@@ -1,11 +1,11 @@
 use crate::tester::ZekeTester;
+use anyhow::Result;
 use assert_cmd::prelude::*;
 use assert_fs::prelude::*;
 use predicates::prelude::*;
-use std::error::Error;
 
 #[test]
-fn unlinks_both_notes() -> Result<(), Box<dyn Error>> {
+fn unlinks_both_notes() -> Result<()> {
     let t = ZekeTester::new();
     let path_a = "a.md";
     let path_b = "b.md";
@@ -50,7 +50,7 @@ Esse cumque saepe laboriosam.",
 }
 
 #[test]
-fn fails_without_extant_path_a() -> Result<(), Box<dyn Error>> {
+fn fails_without_extant_path_a() -> Result<()> {
     let t = ZekeTester::new();
     let path_a = "a.md";
     let path_b = "b.md";
@@ -66,7 +66,7 @@ fn fails_without_extant_path_a() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn fails_without_extant_path_b() -> Result<(), Box<dyn Error>> {
+fn fails_without_extant_path_b() -> Result<()> {
     let t = ZekeTester::new();
     let path_a = "a.md";
     let path_b = "b.md";
@@ -82,7 +82,7 @@ fn fails_without_extant_path_b() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
-fn does_not_modify_other_file_content() -> Result<(), Box<dyn Error>> {
+fn does_not_modify_other_file_content() -> Result<()> {
     let t = ZekeTester::new();
     let path_a = "a.md";
     let path_b = "b.md";

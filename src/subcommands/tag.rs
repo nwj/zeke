@@ -1,9 +1,9 @@
 use crate::note::Note;
+use anyhow::Result;
 use clap::ArgMatches;
-use std::error::Error;
 use std::path::PathBuf;
 
-pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
+pub fn run(matches: &ArgMatches) -> Result<()> {
     let tag = match matches.value_of("TAG") {
         Some(s) => s.to_string(),
         _ => unreachable!(),

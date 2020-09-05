@@ -1,10 +1,10 @@
+use anyhow::Result;
 use path_clean::PathClean;
 use pulldown_cmark::CowStr;
 use pulldown_cmark::Event as MarkdownEvent;
 use pulldown_cmark::Parser as MarkdownParser;
 use pulldown_cmark::Tag as MarkdownTag;
 use pulldown_cmark_to_cmark::cmark;
-use std::error::Error;
 use std::ffi::OsStr;
 use std::fmt;
 use std::path::Path;
@@ -18,11 +18,7 @@ impl Content {
         Content(String::new())
     }
 
-    pub fn replace_note_links<P: AsRef<Path>>(
-        &self,
-        from: &P,
-        to: &P,
-    ) -> Result<Content, Box<dyn Error>> {
+    pub fn replace_note_links<P: AsRef<Path>>(&self, from: &P, to: &P) -> Result<Content> {
         let from_ref = from.as_ref();
         let to_ref = to.as_ref();
 
@@ -112,7 +108,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn replace_note_links() -> Result<(), Box<dyn Error>> {
+    fn replace_note_links() -> Result<()> {
         let content = Content::from("This is a [message](one.md) with [some](two.md) [note](two.md) [links](https://www.google.com).");
         assert_eq!(
             content.replace_note_links(&Path::new("two.md"), &Path::new("three.md"))?,
@@ -122,7 +118,7 @@ mod tests {
     }
 
     #[test]
-    fn replace_note_links_doesnt_modify_content_if_no_link() -> Result<(), Box<dyn Error>> {
+    fn replace_note_links_doesnt_modify_content_if_no_link() -> Result<()> {
         let content = Content::from("This is a [message](one.md) with [some](two.md) [note](two.md) [links](https://www.google.com).");
         assert_eq!(
             content.replace_note_links(&Path::new("garbage.md"), &Path::new("more_garbage.md"))?,
@@ -132,7 +128,7 @@ mod tests {
     }
 
     #[test]
-    fn has_note_link() -> Result<(), Box<dyn Error>> {
+    fn has_note_link() -> Result<()> {
         let content = Content::from("This is a [message](./one.md) with [some](two.md) [note](catdog.md) [links](https://www.google.com).");
         assert!(content.has_note_link(&"one.md"));
         assert!(!content.has_note_link(&"dog.md"));
@@ -140,7 +136,7 @@ mod tests {
     }
 
     #[test]
-    fn get_note_links() -> Result<(), Box<dyn Error>> {
+    fn get_note_links() -> Result<()> {
         let content = Content::from("This is a [message](one.md) with [some](two.md) [note](two.md) [links](https://www.google.com).");
         assert_eq!(
             content.get_note_links(),

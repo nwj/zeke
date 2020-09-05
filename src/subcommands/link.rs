@@ -1,10 +1,10 @@
 use crate::note::Note;
+use anyhow::Result;
 use clap::ArgMatches;
 use path_clean::PathClean;
-use std::error::Error;
 use std::path::PathBuf;
 
-pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
+pub fn run(matches: &ArgMatches) -> Result<()> {
     let path_a = match matches.value_of("FILE_A") {
         Some(s) => PathBuf::from(s).clean(),
         _ => unreachable!(),

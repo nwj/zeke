@@ -1,10 +1,10 @@
 use crate::note::Note;
+use anyhow::Result;
 use clap::ArgMatches;
-use std::error::Error;
-use std::process::Command;
 use std::env;
+use std::process::Command;
 
-pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
+pub fn run(matches: &ArgMatches) -> Result<()> {
     let title = match matches.value_of("TITLE") {
         Some(s) => s.to_string(),
         _ => unreachable!(),
