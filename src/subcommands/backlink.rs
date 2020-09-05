@@ -1,11 +1,22 @@
 use crate::note::Note;
 use anyhow::Result;
 use path_clean::PathClean;
+use std::ffi::OsStr;
 use std::fs;
 
 pub fn run() -> Result<()> {
     for entry in fs::read_dir(".")? {
-        let note = match Note::read_from_file(&entry?.path()) {
+        let p = &entry?.path();
+
+        if p.is_dir() {
+            continue;
+        }
+
+        if p.extension().unwrap_or_default() != OsStr::new("md") {
+            continue;
+        }
+
+        let note = match Note::read_from_file(&p) {
             Ok(n) => n,
             Err(_) => continue,
         };

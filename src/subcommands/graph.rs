@@ -4,6 +4,7 @@ use path_clean::PathClean;
 use petgraph::dot::Dot;
 use petgraph::graph::UnGraph;
 use std::collections::HashMap;
+use std::ffi::OsStr;
 use std::fs;
 
 pub fn run() -> Result<()> {
@@ -12,7 +13,17 @@ pub fn run() -> Result<()> {
     let mut paths_to_nodes = HashMap::new();
 
     for entry in fs::read_dir(".")? {
-        match Note::read_from_file(&entry?.path().clean()) {
+        let p = entry?.path();
+
+        if p.is_dir() {
+            continue;
+        }
+
+        if p.extension().unwrap_or_default() != OsStr::new("md") {
+            continue;
+        }
+
+        match Note::read_from_file(&p.clean()) {
             Ok(note) => {
                 notes.push(note);
             }

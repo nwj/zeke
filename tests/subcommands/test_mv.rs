@@ -170,3 +170,14 @@ Esse cumque saepe laboriosam.",
 
     Ok(())
 }
+
+#[test]
+fn does_not_panic_on_directories() -> Result<()> {
+    let t = ZekeTester::new();
+    let path_a = "a.md";
+    t.temp_dir.child(path_a).touch()?;
+    t.temp_dir.child("subdir").create_dir_all()?;
+
+    t.zeke_mv(path_a, "B")?.assert().success();
+    Ok(())
+}

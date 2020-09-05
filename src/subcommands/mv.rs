@@ -4,6 +4,7 @@ use clap::ArgMatches;
 use path_clean::PathClean;
 use std::fs;
 use std::path::PathBuf;
+use std::ffi::OsStr;
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
     let old_path = match matches.value_of("FILE") {
@@ -24,7 +25,19 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
     for entry in fs::read_dir(".")? {
         let p = entry?.path();
-        let mut n = Note::read_from_file(&p)?;
+
+        if p.is_dir() {
+            continue
+        }
+
+        if p.extension().unwrap_or_default() != OsStr::new("md") {
+            continue
+        }
+
+        let mut n = match Note::read_from_file(&p) {
+            Ok(n) => n,
+            Err(_) => continue
+        };
         let mut should_write = false;
 
         if n.front_matter.links.remove(&old_path) {
