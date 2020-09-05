@@ -1,5 +1,7 @@
 # Unreleased
 
+# v0.5.0
+
 ## Features
 
 - **[Breaking Change]** Error output now includes more context and should be much easier to understand.
