@@ -120,7 +120,7 @@ fn main() {
         .get_matches();
 
     if let Err(e) = zeke::run(&matches) {
-        eprintln!("[{} error] {}", crate_name!(), e);
+        eprintln!("{:?}", e);
         process::exit(1);
     }
 }

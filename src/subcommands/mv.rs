@@ -1,5 +1,5 @@
 use crate::note::Note;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::ArgMatches;
 use path_clean::PathClean;
 use std::fs;
@@ -18,7 +18,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
     let mut note = Note::read_from_file(&old_path)?;
     note.front_matter.title = new_title;
-    let new_path = note.generate_path()?;
+    let new_path = note.generate_path();
     note.path = Some(new_path.clone());
     note.write_to_file(true)?;
 
@@ -32,7 +32,15 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             should_write = true;
         }
 
-        let new_content = n.content.replace_note_links(&old_path, &new_path)?;
+        let new_content = n
+            .content
+            .replace_note_links(&old_path, &new_path)
+            .with_context(|| {
+                format!(
+                    "Failed to update reference to target note in note file `{}`",
+                    &p.display()
+                )
+            })?;
         if new_content != n.content {
             n.content = new_content;
             should_write = true;
@@ -43,7 +51,8 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
     }
 
-    fs::remove_file(&old_path)?;
+    fs::remove_file(&old_path)
+        .with_context(|| format!("Failed to remove old note file `{}`", &old_path.display()))?;
 
     println!("Moved `{}` to `{}`", old_path.display(), new_path.display());
     Ok(())

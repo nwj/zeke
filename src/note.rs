@@ -1,11 +1,9 @@
 use crate::content::Content;
 use crate::front_matter::FrontMatter;
-use anyhow::Result;
+use anyhow::{anyhow, Context, Result};
 use regex::Regex;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use std::io::Error as IOError;
-use std::io::ErrorKind as IOErrorKind;
 use std::path::PathBuf;
 
 #[derive(Debug, PartialEq)]
@@ -25,20 +23,24 @@ impl Note {
     }
 
     pub fn write_to_file(&self, create_new: bool) -> Result<()> {
-        let path = self.path.as_ref().ok_or_else(|| {
-            IOError::new(
-                IOErrorKind::NotFound,
-                "Cannot write note as it does not have a corresponding path.",
-            )
-        })?;
+        let path = self
+            .path
+            .as_ref()
+            .ok_or_else(|| anyhow!("Attempted to write a note that does not have a path"))?;
 
         let mut file = OpenOptions::new()
             .write(true)
             .create_new(create_new)
             .truncate(true)
-            .open(&path)?;
+            .open(&path)
+            .with_context(|| format!("Failed to open note file `{}`", &path.display()))?;
 
-        file.write_all(self.to_string()?.as_bytes())?;
+        file.write_all(
+            self.to_string()
+                .with_context(|| format!("Failed to serialize note file `{}", &path.display()))?
+                .as_bytes(),
+        )
+        .with_context(|| format!("Failed to write note file `{}`", &path.display()))?;
         Ok(())
     }
 
@@ -46,12 +48,15 @@ impl Note {
         let mut file = OpenOptions::new()
             .read(true)
             .create_new(false)
-            .open(&path)?;
+            .open(&path)
+            .with_context(|| format!("Failed to open note file `{}`", &path.display()))?;
 
         let mut file_content = String::new();
-        file.read_to_string(&mut file_content)?;
+        file.read_to_string(&mut file_content)
+            .with_context(|| format!("Failed to read note file `{}`", &path.display()))?;
 
-        let (front_matter, content) = Note::from_string(file_content)?;
+        let (front_matter, content) = Note::from_string(file_content)
+            .with_context(|| format!("Failed to deserialize note file `{}`", &path.display()))?;
         Ok(Note {
             front_matter,
             content,
@@ -59,16 +64,19 @@ impl Note {
         })
     }
 
-    pub fn generate_path(&self) -> Result<PathBuf> {
-        let punctuation_stripped =
-            Regex::new(r"[[:punct:]]")?.replace_all(&self.front_matter.title, "");
-        let spaces_replaced = Regex::new(r"\s")?.replace_all(&punctuation_stripped, "_");
+    pub fn generate_path(&self) -> PathBuf {
+        let punctuation_stripped = Regex::new(r"[[:punct:]]")
+            .unwrap()
+            .replace_all(&self.front_matter.title, "");
+        let spaces_replaced = Regex::new(r"\s")
+            .unwrap()
+            .replace_all(&punctuation_stripped, "_");
         let title_part = spaces_replaced.to_lowercase();
         let path_string = match self.front_matter.created {
             Some(ts) => format!("{}-{}.md", ts.format("%Y%m%d"), title_part),
             None => format!("{}.md", title_part),
         };
-        Ok(PathBuf::from(path_string))
+        PathBuf::from(path_string)
     }
 
     fn to_string(&self) -> Result<String> {
@@ -199,7 +207,7 @@ mod tests {
             path: None,
         };
         assert_eq!(
-            n.generate_path()?,
+            n.generate_path(),
             PathBuf::from("20200408-this_is_a_test.md")
         );
         Ok(())
@@ -218,7 +226,7 @@ mod tests {
             content: Content::new(),
             path: None,
         };
-        assert_eq!(n.generate_path()?, PathBuf::from("this_is_a_test.md"));
+        assert_eq!(n.generate_path(), PathBuf::from("this_is_a_test.md"));
         Ok(())
     }
 
@@ -235,7 +243,7 @@ mod tests {
             content: Content::new(),
             path: None,
         };
-        assert_eq!(n.generate_path()?, PathBuf::from("does_this_work_yall.md"));
+        assert_eq!(n.generate_path(), PathBuf::from("does_this_work_yall.md"));
         Ok(())
     }
 

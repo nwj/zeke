@@ -1,5 +1,5 @@
 use crate::note::Note;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::ArgMatches;
 use std::env;
 use std::process::Command;
@@ -12,15 +12,20 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
 
     let mut note = Note::new();
     note.front_matter.title = title;
-    let path = note.generate_path()?;
+    let path = note.generate_path();
     note.path = Some(path.clone());
 
     note.write_to_file(true)?;
     println!("Created `{}` note file", path.to_string_lossy());
 
     if matches.is_present("edit") {
-        let cmd = env::var("ZEKE_EDITOR")?;
-        Command::new(cmd).arg(&path).spawn()?.wait()?;
+        let cmd = env::var("ZEKE_EDITOR")
+            .with_context(|| "Failed attempting to get the ZEKE_EDITOR env variable")?;
+        Command::new(&cmd)
+            .arg(&path)
+            .spawn()
+            .with_context(|| format!("Failed to spawn editor process `{}`", &cmd))?
+            .wait()?;
     }
 
     Ok(())
