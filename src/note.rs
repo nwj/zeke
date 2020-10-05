@@ -45,18 +45,12 @@ impl Note {
     }
 
     pub fn read_from_file(path: &PathBuf) -> Result<Note> {
-        let mut file = OpenOptions::new()
-            .read(true)
-            .create_new(false)
-            .open(&path)
-            .with_context(|| format!("Failed to open note file `{}`", &path.display()))?;
-
-        let mut file_content = String::new();
-        file.read_to_string(&mut file_content)
+        let file_content = std::fs::read_to_string(&path)
             .with_context(|| format!("Failed to read note file `{}`", &path.display()))?;
 
         let (front_matter, content) = Note::from_string(file_content)
             .with_context(|| format!("Failed to deserialize note file `{}`", &path.display()))?;
+
         Ok(Note {
             front_matter,
             content,
