@@ -1,6 +1,7 @@
 use crate::note::Note;
 use anyhow::Result;
 use ignore::{overrides::OverrideBuilder, types::TypesBuilder, WalkBuilder};
+use rayon::prelude::*;
 use std::collections::HashSet;
 
 pub fn run() -> Result<()> {
@@ -22,7 +23,7 @@ pub fn run() -> Result<()> {
         .collect();
 
     let mut tags: Vec<_> = entries
-        .iter()
+        .par_iter()
         .map(|entry| match Note::read_from_file(entry.path()) {
             Ok(n) => n.front_matter.tags,
             Err(_) => HashSet::new(),
@@ -30,7 +31,7 @@ pub fn run() -> Result<()> {
         .flatten()
         .collect();
 
-    tags.sort();
+    tags.par_sort();
     tags.dedup();
 
     for t in tags {
