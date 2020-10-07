@@ -1,5 +1,7 @@
 # Unreleased
 
+- **[Breaking Change]** `tags` will now ignore notes that are hidden files, that match patterns in a `.ignore` file, or that match patterns in a `.gitignore` file (if running in a path that has a git repository). It will also now look at notes in subdirectories of the context in which it is run.
+
 # v0.5.1
 
 ## Bug Fixes

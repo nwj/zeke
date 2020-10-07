@@ -18,6 +18,7 @@ pulldown-cmark = { version = "^0.7.2", default-features = false, features = ["si
 pulldown-cmark-to-cmark = "^5.0.0"
 path-clean = "^0.1.0"
 anyhow = "^1.0.32"
+ignore="^0.4.16"
 
 [dev-dependencies]
 assert_cmd = "^1.0.1"

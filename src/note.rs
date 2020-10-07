@@ -4,7 +4,7 @@ use anyhow::{anyhow, Context, Result};
 use regex::Regex;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, PartialEq)]
 pub struct Note {
@@ -44,17 +44,17 @@ impl Note {
         Ok(())
     }
 
-    pub fn read_from_file(path: &PathBuf) -> Result<Note> {
-        let file_content = std::fs::read_to_string(&path)
-            .with_context(|| format!("Failed to read note file `{}`", &path.display()))?;
+    pub fn read_from_file<P: AsRef<Path>>(path: P) -> Result<Note> {
+        let file_content = std::fs::read_to_string(path.as_ref())
+            .with_context(|| format!("Failed to read note file `{}`", &path.as_ref().display()))?;
 
         let (front_matter, content) = Note::from_string(file_content)
-            .with_context(|| format!("Failed to deserialize note file `{}`", &path.display()))?;
+            .with_context(|| format!("Failed to deserialize note file `{}`", &path.as_ref().display()))?;
 
         Ok(Note {
             front_matter,
             content,
-            path: Some(path.clone()),
+            path: Some(path.as_ref().to_path_buf()),
         })
     }
 
