@@ -1,5 +1,6 @@
 use anyhow::Result;
 use assert_cmd::prelude::*;
+use assert_fs::prelude::*;
 use assert_fs::TempDir;
 use std::process::Command;
 
@@ -71,5 +72,12 @@ impl ZekeTester {
         let mut cmd = self.zeke()?;
         cmd.arg("backlink");
         Ok(cmd)
+    }
+
+    pub fn setup_fs(&self, files: Vec<(&str, &str)>) -> Result<()> {
+        for (path, content) in files {
+            self.temp_dir.child(path).write_str(content)?;
+        }
+        Ok(())
     }
 }
