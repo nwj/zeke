@@ -74,10 +74,9 @@ impl ZekeTester {
         Ok(cmd)
     }
 
-    pub fn setup_fs(&self, files: Vec<(&str, &str)>) -> Result<()> {
-        for (path, content) in files {
-            self.temp_dir.child(path).write_str(content)?;
-        }
+    pub fn setup_fs(&self, path_to_copy: &str) -> Result<()> {
+        self.temp_dir
+            .copy_from(format!("tests/data/{}", path_to_copy), &["**/*"])?;
         Ok(())
     }
 }
