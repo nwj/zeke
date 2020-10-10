@@ -5,9 +5,10 @@ WARMUP_COUNT=5
 DIR_SIZE=1000
 
 # Commands to benchmark
-COMMAND_TAGS="zeke tags"
 COMMAND_BACKLINK="zeke backlink"
 COMMAND_GRAPH="zeke graph"
+COMMAND_MV="zeke mv"
+COMMAND_TAGS="zeke tags"
 
 if ! which hyperfine > /dev/null 2>&1; then
 	echo "'hyperfine' does not seem to be installed."
@@ -31,6 +32,7 @@ echo -e "$(tput el)Created $DIR_SIZE temp files.\n"
 hyperfine --warmup $WARMUP_COUNT \
 	"$COMMAND_BACKLINK" \
 	"$COMMAND_GRAPH" \
+	"$COMMAND_MV \$(ls | head -n 1) \$RANDOM\$RANDOM" \
 	"$COMMAND_TAGS"
 
 echo -ne "\nCleaning up temp files...\r"
