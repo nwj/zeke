@@ -1,10 +1,10 @@
 use crate::note::Note;
 use anyhow::{Context, Result};
 use clap::ArgMatches;
+use ignore::{overrides::OverrideBuilder, types::TypesBuilder, WalkBuilder};
 use path_clean::PathClean;
 use std::fs;
 use std::path::PathBuf;
-use std::ffi::OsStr;
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
     let old_path = match matches.value_of("FILE") {
@@ -23,20 +23,29 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     note.path = Some(new_path.clone());
     note.write_to_file(true)?;
 
-    for entry in fs::read_dir(".")? {
-        let p = entry?.path();
+    let markdown_matcher = TypesBuilder::new()
+        .add_defaults()
+        .select("markdown")
+        .build()?;
 
-        if p.is_dir() {
-            continue
-        }
+    // This override, which ignores hidden entries, is necessary because the markdown matcher
+    // itself overrides the WalkBuilder's default filtering of hidden entries.
+    let hidden_override = OverrideBuilder::new("./").add("!.*")?.build()?;
 
-        if p.extension().unwrap_or_default() != OsStr::new("md") {
-            continue
-        }
+    let entries: Vec<_> = WalkBuilder::new("./")
+        .types(markdown_matcher)
+        .overrides(hidden_override)
+        .build()
+        .into_iter()
+        .filter_map(|r| r.ok())
+        .collect();
+
+    for entry in entries {
+        let p = entry.path();
 
         let mut n = match Note::read_from_file(&p) {
             Ok(n) => n,
-            Err(_) => continue
+            Err(_) => continue,
         };
         let mut should_write = false;
 

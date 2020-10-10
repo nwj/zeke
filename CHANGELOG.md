@@ -1,6 +1,6 @@
 # Unreleased
 
-- **[Breaking Change]** `tags` will now ignore notes that are hidden files, that match patterns in a `.ignore` file, or that match patterns in a `.gitignore` file (if running in a path that has a git repository). It will also now look at notes in subdirectories of the context in which it is run.
+- **[Breaking Change]** `tags` and `mv` (when updating links to a moved note) now ignore notes that are hidden files, that match patterns in a `.ignore` file, or that match patterns in a `.gitignore` file (if running in a path that has a git repository).
 - `tags` should now run substantially faster in some environments thanks to the introduction of concurrency.
 
 # v0.5.1
