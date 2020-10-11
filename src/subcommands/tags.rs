@@ -18,7 +18,6 @@ pub fn run() -> Result<()> {
         .types(markdown_matcher)
         .overrides(hidden_override)
         .build()
-        .into_iter()
         .filter_map(|r| r.ok())
         .collect();
 

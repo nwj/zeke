@@ -3,6 +3,7 @@ use anyhow::{Context, Result};
 use clap::ArgMatches;
 use ignore::{overrides::OverrideBuilder, types::TypesBuilder, WalkBuilder};
 use path_clean::PathClean;
+use rayon::prelude::*;
 use std::fs;
 use std::path::PathBuf;
 
@@ -36,41 +37,51 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         .types(markdown_matcher)
         .overrides(hidden_override)
         .build()
-        .into_iter()
         .filter_map(|r| r.ok())
         .collect();
 
-    for entry in entries {
-        let p = entry.path();
+    let errs: Vec<_> = entries
+        .par_iter()
+        .map(|e| Note::read_from_file(e.path()))
+        .filter_map(|r| r.ok())
+        .map(|mut n| -> Result<()> {
+            let mut should_write = false;
 
-        let mut n = match Note::read_from_file(&p) {
-            Ok(n) => n,
-            Err(_) => continue,
-        };
-        let mut should_write = false;
+            if n.front_matter.links.remove(&old_path) {
+                n.front_matter.links.insert(new_path.clone());
+                should_write = true;
+            }
 
-        if n.front_matter.links.remove(&old_path) {
-            n.front_matter.links.insert(new_path.clone());
-            should_write = true;
-        }
+            let new_content = n
+                .content
+                .replace_note_links(&old_path, &new_path)
+                .with_context(|| {
+                    format!(
+                        "Failed to update possible references to target note in note file `{}`",
+                        n.path.clone().unwrap().display()
+                    )
+                })?;
+            if new_content != n.content {
+                n.content = new_content;
+                should_write = true;
+            }
 
-        let new_content = n
-            .content
-            .replace_note_links(&old_path, &new_path)
-            .with_context(|| {
-                format!(
-                    "Failed to update reference to target note in note file `{}`",
-                    &p.display()
-                )
-            })?;
-        if new_content != n.content {
-            n.content = new_content;
-            should_write = true;
-        }
+            if should_write {
+                n.write_to_file(false).with_context(|| {
+                    format!(
+                        "Failed to update possible references to target note in note file `{}`",
+                        n.path.clone().unwrap().display()
+                    )
+                })?;
+            }
 
-        if should_write {
-            n.write_to_file(false)?;
-        }
+            Ok(())
+        })
+        .filter_map(|r| r.err())
+        .collect();
+
+    for e in errs {
+        eprintln!("{:?}", e);
     }
 
     fs::remove_file(&old_path)
