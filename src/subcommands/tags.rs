@@ -1,16 +1,16 @@
-use crate::fs;
+use crate::fs::{read_dir, read_note};
 use anyhow::Result;
 use rayon::prelude::*;
 use std::collections::HashSet;
 
 pub fn run() -> Result<()> {
-    let entries: Vec<_> = fs::read_dir("./")?
+    let entries: Vec<_> = read_dir("./")?
         .filter_map(|r| r.ok())
         .collect();
 
     let mut tags: Vec<_> = entries
         .par_iter()
-        .map(|entry| match fs::read_note(entry.path()) {
+        .map(|entry| match read_note(entry.path()) {
             Ok(n) => n.front_matter.tags,
             Err(_) => HashSet::new(),
         })
