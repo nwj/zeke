@@ -1,3 +1,4 @@
+use crate::fs::write_note;
 use crate::note::Note;
 use anyhow::{Context, Result};
 use clap::ArgMatches;
@@ -15,7 +16,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     let path = note.generate_path();
     note.path = Some(path.clone());
 
-    note.write_to_file(true)?;
+    write_note(&note, true)?;
     println!("Created `{}` note file", path.to_string_lossy());
 
     if matches.is_present("edit") {

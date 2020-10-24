@@ -1,4 +1,4 @@
-use crate::note::Note;
+use crate::fs::{read_note, write_note};
 use anyhow::Result;
 use clap::ArgMatches;
 use std::path::PathBuf;
@@ -15,10 +15,10 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     };
 
     for path in paths.iter() {
-        let mut note = Note::read_from_file(&path)?;
+        let mut note = read_note(&path)?;
 
         if note.front_matter.tags.remove(&tag) {
-            note.write_to_file(false)?;
+            write_note(&note, false)?;
         }
     }
 

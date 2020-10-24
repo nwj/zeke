@@ -1,10 +1,9 @@
-use crate::note::Note;
+use crate::fs::{read_dir, read_note, write_note};
 use anyhow::{Context, Result};
 use clap::ArgMatches;
-use ignore::{overrides::OverrideBuilder, types::TypesBuilder, WalkBuilder};
 use path_clean::PathClean;
 use rayon::prelude::*;
-use std::fs;
+use std::fs::remove_file;
 use std::path::PathBuf;
 
 pub fn run(matches: &ArgMatches) -> Result<()> {
@@ -18,31 +17,17 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         _ => unreachable!(),
     };
 
-    let mut note = Note::read_from_file(&old_path)?;
+    let mut note = read_note(&old_path)?;
     note.front_matter.title = new_title;
     let new_path = note.generate_path();
     note.path = Some(new_path.clone());
-    note.write_to_file(true)?;
+    write_note(&note, true)?;
 
-    let markdown_matcher = TypesBuilder::new()
-        .add_defaults()
-        .select("markdown")
-        .build()?;
-
-    // This override, which ignores hidden entries, is necessary because the markdown matcher
-    // itself overrides the WalkBuilder's default filtering of hidden entries.
-    let hidden_override = OverrideBuilder::new("./").add("!.*")?.build()?;
-
-    let entries: Vec<_> = WalkBuilder::new("./")
-        .types(markdown_matcher)
-        .overrides(hidden_override)
-        .build()
-        .filter_map(|r| r.ok())
-        .collect();
+    let entries: Vec<_> = read_dir("./")?.filter_map(|r| r.ok()).collect();
 
     let errs: Vec<_> = entries
         .par_iter()
-        .map(|e| Note::read_from_file(e.path()))
+        .map(|e| read_note(e.path()))
         .filter_map(|r| r.ok())
         .map(|mut n| -> Result<()> {
             let mut should_write = false;
@@ -67,7 +52,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             }
 
             if should_write {
-                n.write_to_file(false).with_context(|| {
+                write_note(&n, false).with_context(|| {
                     format!(
                         "Failed to update possible references to target note in note file `{}`",
                         n.path.clone().unwrap().display()
@@ -84,7 +69,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         eprintln!("{:?}", e);
     }
 
-    fs::remove_file(&old_path)
+    remove_file(&old_path)
         .with_context(|| format!("Failed to remove old note file `{}`", &old_path.display()))?;
 
     println!("Moved `{}` to `{}`", old_path.display(), new_path.display());

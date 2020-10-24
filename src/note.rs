@@ -1,10 +1,8 @@
 use crate::content::Content;
 use crate::front_matter::FrontMatter;
-use anyhow::{anyhow, Context, Result};
+use anyhow::Result;
 use regex::Regex;
-use std::fs::OpenOptions;
-use std::io::prelude::*;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 #[derive(Debug, PartialEq)]
 pub struct Note {
@@ -22,42 +20,6 @@ impl Note {
         }
     }
 
-    pub fn write_to_file(&self, create_new: bool) -> Result<()> {
-        let path = self
-            .path
-            .as_ref()
-            .ok_or_else(|| anyhow!("Attempted to write a note that does not have a path"))?;
-
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create_new(create_new)
-            .truncate(true)
-            .open(&path)
-            .with_context(|| format!("Failed to open note file `{}`", &path.display()))?;
-
-        file.write_all(
-            self.to_string()
-                .with_context(|| format!("Failed to serialize note file `{}", &path.display()))?
-                .as_bytes(),
-        )
-        .with_context(|| format!("Failed to write note file `{}`", &path.display()))?;
-        Ok(())
-    }
-
-    pub fn read_from_file<P: AsRef<Path>>(path: P) -> Result<Note> {
-        let file_content = std::fs::read_to_string(path.as_ref())
-            .with_context(|| format!("Failed to read note file `{}`", &path.as_ref().display()))?;
-
-        let (front_matter, content) = Note::from_string(file_content)
-            .with_context(|| format!("Failed to deserialize note file `{}`", &path.as_ref().display()))?;
-
-        Ok(Note {
-            front_matter,
-            content,
-            path: Some(path.as_ref().to_path_buf()),
-        })
-    }
-
     pub fn generate_path(&self) -> PathBuf {
         let punctuation_stripped = Regex::new(r"[[:punct:]]")
             .unwrap()
@@ -73,7 +35,7 @@ impl Note {
         PathBuf::from(path_string)
     }
 
-    fn to_string(&self) -> Result<String> {
+    pub fn to_string(&self) -> Result<String> {
         Ok(format!(
             "{}\n{}",
             self.front_matter.to_yaml_string()?,
@@ -81,7 +43,7 @@ impl Note {
         ))
     }
 
-    fn from_string(s: String) -> Result<(FrontMatter, Content)> {
+    pub fn from_string(s: String) -> Result<(FrontMatter, Content)> {
         if !s.starts_with("---\n") {
             return Ok((FrontMatter::default(), Content::from(s)));
         }

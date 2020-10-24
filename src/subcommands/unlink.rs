@@ -1,4 +1,4 @@
-use crate::note::Note;
+use crate::fs::{read_note, write_note};
 use anyhow::Result;
 use clap::ArgMatches;
 use path_clean::PathClean;
@@ -15,15 +15,15 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         _ => unreachable!(),
     };
 
-    let mut note_a = Note::read_from_file(&path_a)?;
-    let mut note_b = Note::read_from_file(&path_b)?;
+    let mut note_a = read_note(&path_a)?;
+    let mut note_b = read_note(&path_b)?;
 
     if note_a.front_matter.links.remove(&path_b) {
-        note_a.write_to_file(false)?;
+        write_note(&note_a, false)?;
     }
 
     if note_b.front_matter.links.remove(&path_a) {
-        note_b.write_to_file(false)?;
+        write_note(&note_b, false)?;
     }
 
     println!(

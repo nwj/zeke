@@ -3,6 +3,7 @@ use clap::ArgMatches;
 
 mod content;
 mod front_matter;
+mod fs;
 mod note;
 mod subcommands;
 

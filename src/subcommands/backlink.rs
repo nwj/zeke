@@ -1,4 +1,4 @@
-use crate::note::Note;
+use crate::fs::{read_note, write_note};
 use anyhow::Result;
 use path_clean::PathClean;
 use std::ffi::OsStr;
@@ -16,13 +16,13 @@ pub fn run() -> Result<()> {
             continue;
         }
 
-        let note = match Note::read_from_file(&p) {
+        let note = match read_note(&p) {
             Ok(n) => n,
             Err(_) => continue,
         };
 
         for link in note.content.get_note_links().iter() {
-            let mut linked_note = match Note::read_from_file(link) {
+            let mut linked_note = match read_note(link) {
                 Ok(n) => n,
                 Err(_) => continue,
             };
@@ -32,7 +32,7 @@ pub fn run() -> Result<()> {
                 .links
                 .insert(note.path.clone().unwrap().clean())
             {
-                linked_note.write_to_file(false)?;
+                write_note(&linked_note, false)?;
             }
         }
     }

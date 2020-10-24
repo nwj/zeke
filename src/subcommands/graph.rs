@@ -1,4 +1,4 @@
-use crate::note::Note;
+use crate::fs::read_note;
 use anyhow::Result;
 use path_clean::PathClean;
 use petgraph::dot::Dot;
@@ -23,7 +23,7 @@ pub fn run() -> Result<()> {
             continue;
         }
 
-        match Note::read_from_file(&p.clean()) {
+        match read_note(&p.clean()) {
             Ok(note) => {
                 notes.push(note);
             }
