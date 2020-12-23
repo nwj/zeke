@@ -1,20 +1,10 @@
-use crate::fs::{read_note, write_note};
+use crate::fs::{read_dir, read_note, write_note};
 use anyhow::Result;
 use path_clean::PathClean;
-use std::ffi::OsStr;
-use std::fs;
 
 pub fn run() -> Result<()> {
-    for entry in fs::read_dir(".")? {
-        let p = &entry?.path();
-
-        if p.is_dir() {
-            continue;
-        }
-
-        if p.extension().unwrap_or_default() != OsStr::new("md") {
-            continue;
-        }
+    for entry in read_dir("./")?.filter_map(|r| r.ok()) {
+        let p = &entry.path();
 
         let note = match read_note(&p) {
             Ok(n) => n,
