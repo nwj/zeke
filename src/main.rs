@@ -4,7 +4,7 @@ use std::process;
 fn main() {
     let matches = App::new(crate_name!())
         .version(crate_version!())
-        .about(crate_description!())
+        .about(&*format!("\n{}\nProject home page: https://github.com/nwj/zeke", crate_description!()))
         .setting(AppSettings::ArgRequiredElseHelp)
         .setting(AppSettings::VersionlessSubcommands)
         .subcommand(
@@ -22,42 +22,24 @@ fn main() {
                         .help("Opens the new note in the editor specified by the $ZEKE_EDITOR env variable")
                         .long("edit")
                 )
+                .display_order(1)
         )
         .subcommand(
-            SubCommand::with_name("link")
-                .about("Link a note to another note")
+            SubCommand::with_name("mv")
+                .about("Rename a note and update references to the old name")
                 .arg(
-                    Arg::with_name("FILE_A")
-                        .help("Path to one note to link")
+                    Arg::with_name("FILE")
+                        .help("Path to the note to move")
                         .required(true)
                         .index(1)
                 )
                 .arg(
-                    Arg::with_name("FILE_B")
-                        .help("Path to the other note to link")
+                    Arg::with_name("TITLE")
+                        .help("New title for the note")
                         .required(true)
                         .index(2)
                 )
-        )
-        .subcommand(
-            SubCommand::with_name("unlink")
-                .about("Unlink a note from another note")
-                .arg(
-                    Arg::with_name("FILE_A")
-                        .help("Path to one note to unlink")
-                        .required(true)
-                        .index(1)
-                )
-                .arg(
-                    Arg::with_name("FILE_B")
-                        .help("Path to the other note to unlink")
-                        .required(true)
-                        .index(2)
-                )
-        )
-        .subcommand(
-            SubCommand::with_name("tags")
-                .about("List all tags")
+                .display_order(2)
         )
         .subcommand(
             SubCommand::with_name("tag")
@@ -75,6 +57,7 @@ fn main() {
                         .multiple(true)
                         .index(2)
                 )
+                .display_order(3)
         )
         .subcommand(
             SubCommand::with_name("untag")
@@ -92,30 +75,55 @@ fn main() {
                         .multiple(true)
                         .index(2)
                 )
+                .display_order(4)
         )
         .subcommand(
-            SubCommand::with_name("graph")
-                .about("Generate a representation of the links between all notes in the DOT format")
+            SubCommand::with_name("tags")
+                .about("List all tags")
+                .display_order(5)
         )
         .subcommand(
-            SubCommand::with_name("mv")
-                .about("Rename a note and update references to the old name")
+            SubCommand::with_name("link")
+                .about("Link a note to another note")
                 .arg(
-                    Arg::with_name("FILE")
-                        .help("Path to the note to move")
+                    Arg::with_name("FILE_A")
+                        .help("Path to one note to link")
                         .required(true)
                         .index(1)
                 )
                 .arg(
-                    Arg::with_name("TITLE")
-                        .help("New title for the note")
+                    Arg::with_name("FILE_B")
+                        .help("Path to the other note to link")
                         .required(true)
                         .index(2)
                 )
+                .display_order(6)
+        )
+        .subcommand(
+            SubCommand::with_name("unlink")
+                .about("Unlink a note from another note")
+                .arg(
+                    Arg::with_name("FILE_A")
+                        .help("Path to one note to unlink")
+                        .required(true)
+                        .index(1)
+                )
+                .arg(
+                    Arg::with_name("FILE_B")
+                        .help("Path to the other note to unlink")
+                        .required(true)
+                        .index(2)
+                )
+                .display_order(7)
         )
         .subcommand(
             SubCommand::with_name("backlink")
                 .about("Add backlinks to the front matter of all notes")
+                .display_order(8)
+        )
+        .subcommand(
+            SubCommand::with_name("graph")
+                .about("Generate a representation of the links between all notes in the DOT format")
         )
         .get_matches();
 
