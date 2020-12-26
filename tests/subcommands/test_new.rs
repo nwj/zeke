@@ -12,9 +12,9 @@ fn creates_note() -> Result<()> {
     let t = ZekeTester::new();
 
     let output = t.zeke_new("Cats dogs")?.output()?;
-    let stdout = str::from_utf8(&output.stdout)?;
+    let stderr = str::from_utf8(&output.stderr)?;
     let new_path = Regex::new(r"\d{8}-cats_dogs.md")?
-        .find(stdout)
+        .find(stderr)
         .unwrap()
         .as_str();
     t.temp_dir
@@ -51,7 +51,7 @@ fn spawns_editor_process_if_edit_flag() -> Result<()> {
         .env("ZEKE_EDITOR", "echo")
         .output()?;
     let stdout = str::from_utf8(&output.stdout)?;
-    assert_eq!(stdout.matches(title).count(), 2);
+    assert_eq!(stdout.matches(title).count(), 1);
 
     Ok(())
 }

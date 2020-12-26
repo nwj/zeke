@@ -17,15 +17,15 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     note.path = Some(path.clone());
 
     write_note(&note, true)?;
-    println!("Created `{}` note file", path.to_string_lossy());
+    eprintln!("Created `{}`.", path.to_string_lossy());
 
     if matches.is_present("edit") {
         let cmd = env::var("ZEKE_EDITOR")
-            .with_context(|| "Failed attempting to get the ZEKE_EDITOR env variable")?;
+            .with_context(|| "Failed to start editor process. Check that the ZEKE_EDITOR environment variable is set.")?;
         Command::new(&cmd)
             .arg(&path)
             .spawn()
-            .with_context(|| format!("Failed to spawn editor process `{}`", &cmd))?
+            .with_context(|| format!("Failed to start editor process `{}`.", &cmd))?
             .wait()?;
     }
 
