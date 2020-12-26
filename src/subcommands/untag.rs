@@ -22,8 +22,8 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         }
     }
 
-    println!(
-        "Untagged `{}` from `{}`",
+    eprintln!(
+        "Untagged `{}` from `{}`.",
         paths
             .iter()
             .map(|p| p.to_string_lossy().into_owned())

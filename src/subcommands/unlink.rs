@@ -26,8 +26,8 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         write_note(&note_b, false)?;
     }
 
-    println!(
-        "Unlinked `{}` from `{}`",
+    eprintln!(
+        "Unlinked `{}` from `{}`.",
         path_a.display(),
         path_b.display()
     );

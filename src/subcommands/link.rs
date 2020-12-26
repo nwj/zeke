@@ -26,6 +26,6 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         write_note(&note_b, false)?;
     }
 
-    println!("Linked `{}` to `{}`", path_a.display(), path_b.display());
+    eprintln!("Linked `{}` to `{}`.", path_a.display(), path_b.display());
     Ok(())
 }
