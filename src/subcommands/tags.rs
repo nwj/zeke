@@ -4,9 +4,7 @@ use rayon::prelude::*;
 use std::collections::HashSet;
 
 pub fn run() -> Result<()> {
-    let entries: Vec<_> = read_dir("./")?
-        .filter_map(|r| r.ok())
-        .collect();
+    let entries: Vec<_> = read_dir("./").collect();
 
     let mut tags: Vec<_> = entries
         .par_iter()

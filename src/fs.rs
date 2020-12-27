@@ -1,26 +1,44 @@
 use crate::note::Note;
 use anyhow::{anyhow, Context, Result};
-use ignore::{overrides::OverrideBuilder, types::TypesBuilder, Walk, WalkBuilder};
+use ignore::{DirEntry, WalkBuilder};
+use std::ffi::OsStr;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::path::Path;
 
-pub fn read_dir<P: AsRef<Path>>(path: P) -> Result<Walk> {
+pub fn read_dir<P: AsRef<Path>>(path: P) -> impl Iterator<Item = DirEntry> {
     let p = path.as_ref();
+    WalkBuilder::new(&p)
+        .hidden(true)
+        .parents(true)
+        .ignore(true)
+        .git_ignore(true)
+        .git_global(true)
+        .git_exclude(true)
+        .build()
+        .filter_map(|r| r.ok())
+        .filter(|en| !is_dir(en) && is_markdown(en))
+}
 
-    let markdown_matcher = TypesBuilder::new()
-        .add_defaults()
-        .select("markdown")
-        .build()?;
+fn is_dir(entry: &DirEntry) -> bool {
+    match entry.file_type() {
+        Some(ft) => ft.is_dir(),
+        None => false,
+    }
+}
 
-    // This override, which ignores hidden entries, is necessary because the markdown matcher
-    // itself overrides the WalkBuilder's default filtering of hidden entries.
-    let hidden_override = OverrideBuilder::new(&p).add("!.*")?.build()?;
-
-    Ok(WalkBuilder::new(&p)
-        .types(markdown_matcher)
-        .overrides(hidden_override)
-        .build())
+fn is_markdown(entry: &DirEntry) -> bool {
+    // There may be a bug here, as I'm unsure what the rules are around case sensitivity
+    // and file extensions on various OSes.
+    match entry.path().extension() {
+        Some(ext) => {
+            ext == OsStr::new("md")
+                || ext == OsStr::new("markdown")
+                || ext == OsStr::new("mdown")
+                || ext == OsStr::new("mkdn")
+        }
+        None => false,
+    }
 }
 
 pub fn read_note<P: AsRef<Path>>(path: P) -> Result<Note> {

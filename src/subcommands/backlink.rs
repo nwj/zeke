@@ -4,7 +4,7 @@ use path_clean::PathClean;
 use rayon::prelude::*;
 
 pub fn run() -> Result<()> {
-    let entries: Vec<_> = read_dir("./")?.filter_map(|r| r.ok()).collect();
+    let entries: Vec<_> = read_dir("./").collect();
 
     let link_map: Vec<(_, _)> = entries
         .par_iter()

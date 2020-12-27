@@ -23,7 +23,7 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
     note.path = Some(new_path.clone());
     write_note(&note, true)?;
 
-    let entries: Vec<_> = read_dir("./")?.filter_map(|r| r.ok()).collect();
+    let entries: Vec<_> = read_dir("./").collect();
 
     let errs: Vec<_> = entries
         .par_iter()
