@@ -5,7 +5,7 @@ use clap::ArgMatches;
 use std::env;
 use std::process::Command;
 
-pub fn run(matches: &ArgMatches) -> Result<()> {
+pub fn run(matches: &ArgMatches) -> Result<i32> {
     let title = match matches.value_of("TITLE") {
         Some(s) => s.to_string(),
         _ => unreachable!(),
@@ -29,5 +29,5 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             .wait()?;
     }
 
-    Ok(())
+    Ok(0)
 }

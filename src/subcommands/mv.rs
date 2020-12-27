@@ -6,7 +6,7 @@ use rayon::prelude::*;
 use std::fs::remove_file;
 use std::path::PathBuf;
 
-pub fn run(matches: &ArgMatches) -> Result<()> {
+pub fn run(matches: &ArgMatches) -> Result<i32> {
     let old_path = match matches.value_of("FILE") {
         Some(s) => PathBuf::from(s).clean(),
         _ => unreachable!(),
@@ -73,5 +73,5 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         .with_context(|| format!("Failed to remove old note file `{}`", &old_path.display()))?;
 
     println!("Moved `{}` to `{}`", old_path.display(), new_path.display());
-    Ok(())
+    Ok(0)
 }

@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::fs;
 
-pub fn run() -> Result<()> {
+pub fn run() -> Result<i32> {
     let mut graph = UnGraph::<&str, &str>::new_undirected();
     let mut notes = Vec::new();
     let mut paths_to_nodes = HashMap::new();
@@ -61,5 +61,5 @@ pub fn run() -> Result<()> {
     // render graph to dot file
     println!("{}", Dot::new(&graph));
 
-    Ok(())
+    Ok(0)
 }

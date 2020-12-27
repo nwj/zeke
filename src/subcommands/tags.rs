@@ -3,7 +3,7 @@ use anyhow::Result;
 use rayon::prelude::*;
 use std::collections::HashSet;
 
-pub fn run() -> Result<()> {
+pub fn run() -> Result<i32> {
     let entries: Vec<_> = read_dir("./").collect();
 
     let mut tags: Vec<_> = entries
@@ -21,5 +21,6 @@ pub fn run() -> Result<()> {
     for t in tags {
         println!("{}", t);
     }
-    Ok(())
+
+    Ok(0)
 }

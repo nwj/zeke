@@ -3,7 +3,7 @@ use anyhow::Result;
 use path_clean::PathClean;
 use rayon::prelude::*;
 
-pub fn run() -> Result<()> {
+pub fn run() -> Result<i32> {
     let entries: Vec<_> = read_dir("./").collect();
 
     let link_map: Vec<(_, _)> = entries
@@ -25,6 +25,5 @@ pub fn run() -> Result<()> {
             }
         }
     }
-
-    Ok(())
+    Ok(0)
 }

@@ -7,7 +7,7 @@ mod fs;
 mod note;
 mod subcommands;
 
-pub fn run(matches: &ArgMatches) -> Result<()> {
+pub fn run(matches: &ArgMatches) -> Result<i32> {
     match matches.subcommand() {
         ("new", Some(m)) => subcommands::new::run(m),
         ("link", Some(m)) => subcommands::link::run(m),
@@ -18,6 +18,6 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         ("mv", Some(m)) => subcommands::mv::run(m),
         ("backlink", Some(_)) => subcommands::backlink::run(),
         ("graph", Some(_)) => subcommands::graph::run(),
-        _ => Ok(()),
+        _ => Ok(0),
     }
 }

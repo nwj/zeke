@@ -127,8 +127,11 @@ fn main() {
         )
         .get_matches();
 
-    if let Err(e) = zeke::run(&matches) {
-        eprintln!("{:?}", e);
-        process::exit(1);
+    match zeke::run(&matches) {
+        Ok(exit_code) => process::exit(exit_code),
+        Err(e) => {
+            eprintln!("{:?}", e);
+            process::exit(1)
+        }
     }
 }

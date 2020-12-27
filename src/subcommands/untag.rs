@@ -3,7 +3,7 @@ use anyhow::Result;
 use clap::ArgMatches;
 use std::path::PathBuf;
 
-pub fn run(matches: &ArgMatches) -> Result<()> {
+pub fn run(matches: &ArgMatches) -> Result<i32> {
     let tag = match matches.value_of("TAG") {
         Some(s) => s.to_string(),
         _ => unreachable!(),
@@ -31,5 +31,5 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
             .join(", "),
         &tag
     );
-    Ok(())
+    Ok(0)
 }

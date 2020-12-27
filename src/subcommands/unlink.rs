@@ -4,7 +4,7 @@ use clap::ArgMatches;
 use path_clean::PathClean;
 use std::path::PathBuf;
 
-pub fn run(matches: &ArgMatches) -> Result<()> {
+pub fn run(matches: &ArgMatches) -> Result<i32> {
     let path_a = match matches.value_of("FILE_A") {
         Some(s) => PathBuf::from(s).clean(),
         _ => unreachable!(),
@@ -31,5 +31,5 @@ pub fn run(matches: &ArgMatches) -> Result<()> {
         path_a.display(),
         path_b.display()
     );
-    Ok(())
+    Ok(0)
 }
