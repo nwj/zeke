@@ -17,8 +17,8 @@ pub fn run() -> Result<i32> {
     tags.dedup();
 
     let err_count = errs.len();
-    for err in errs {
-        eprintln!("{:?}", err);
+    for e in errs {
+        eprintln!("{:?}", e);
     }
 
     for t in tags {
