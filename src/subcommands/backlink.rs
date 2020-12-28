@@ -30,26 +30,27 @@ pub fn run() -> Result<i32> {
             acc
         });
 
-     errs = inverse_link_map.par_iter().filter_map(|(path, links)| {
-        let mut linked_note = match read_note(path) {
-            Ok(n) => n,
-            Err(e) => {
-                return Some(e)
-            }
-        };
-
-        let insert_results: Vec<_> = links
-            .iter()
-            .map(|l| linked_note.front_matter.links.insert(l.clean()))
-            .collect();
-        if insert_results.iter().any(|&b| b) {
-            if let Err(e) = write_note(&linked_note, false) {
-                return Some(e)
+    errs = inverse_link_map
+        .par_iter()
+        .filter_map(|(path, links)| {
+            let mut linked_note = match read_note(path) {
+                Ok(n) => n,
+                Err(e) => return Some(e),
             };
-        }
 
-        None
-    }).collect();
+            let insert_results: Vec<_> = links
+                .iter()
+                .map(|l| linked_note.front_matter.links.insert(l.clean()))
+                .collect();
+            if insert_results.iter().any(|&b| b) {
+                if let Err(e) = write_note(&linked_note, false) {
+                    return Some(e);
+                };
+            }
+
+            None
+        })
+        .collect();
 
     err_count += errs.len();
     for e in errs {

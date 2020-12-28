@@ -23,55 +23,64 @@ pub fn run(matches: &ArgMatches) -> Result<i32> {
     note.path = Some(new_path.clone());
     write_note(&note, true)?;
 
-    let entries: Vec<_> = read_dir("./").collect();
+    let errs: Vec<_> = read_dir("./")
+        .par_bridge()
+        .filter_map(|en| {
+            let mut n = match read_note(en.path()) {
+                Ok(n) => n,
+                Err(e) => return Some(e),
+            };
 
-    let errs: Vec<_> = entries
-        .par_iter()
-        .map(|e| read_note(e.path()))
-        .filter_map(|r| r.ok())
-        .map(|mut n| -> Result<()> {
             let mut should_write = false;
-
             if n.front_matter.links.remove(&old_path) {
                 n.front_matter.links.insert(new_path.clone());
                 should_write = true;
             }
-
-            let new_content = n
+            let new_content = match n
                 .content
                 .replace_note_links(&old_path, &new_path)
                 .with_context(|| {
                     format!(
-                        "Failed to update possible references to target note in note file `{}`",
+                        "Failed to update possible references to target note in note file `{}`.",
                         n.path.clone().unwrap().display()
                     )
-                })?;
+                }) {
+                Ok(c) => c,
+                Err(e) => return Some(e),
+            };
+
             if new_content != n.content {
                 n.content = new_content;
                 should_write = true;
             }
 
             if should_write {
-                write_note(&n, false).with_context(|| {
+                if let Err(e) = write_note(&n, false).with_context(|| {
                     format!(
-                        "Failed to update possible references to target note in note file `{}`",
+                        "Failed to update possible references to target note in note file `{}`.",
                         n.path.clone().unwrap().display()
                     )
-                })?;
+                }) {
+                    return Some(e);
+                };
             }
 
-            Ok(())
+            None
         })
-        .filter_map(|r| r.err())
         .collect();
 
+    let err_count = errs.len();
     for e in errs {
         eprintln!("{:?}", e);
     }
 
     remove_file(&old_path)
-        .with_context(|| format!("Failed to remove old note file `{}`", &old_path.display()))?;
+        .with_context(|| format!("Failed to remove old note file `{}`.", &old_path.display()))?;
 
-    println!("Moved `{}` to `{}`", old_path.display(), new_path.display());
-    Ok(0)
+    eprintln!(
+        "Moved `{}` to `{}`.",
+        old_path.display(),
+        new_path.display()
+    );
+    Ok(if err_count > 0 { 1 } else { 0 })
 }
