@@ -121,10 +121,6 @@ fn main() {
                 .about("Add backlinks to the front matter of all notes")
                 .display_order(8)
         )
-        .subcommand(
-            SubCommand::with_name("graph")
-                .about("Generate a representation of the links between all notes in the DOT format")
-        )
         .get_matches();
 
     match zeke::run(&matches) {

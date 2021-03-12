@@ -13,7 +13,6 @@ clap = "^2.33.2"
 regex = "^1.4.2"
 serde = { version = "^1.0.118", features = ["derive"] }
 serde_yaml = "^0.8.14"
-petgraph = "^0.5.1"
 pulldown-cmark = { version = "^0.8.0", default-features = false, features = ["simd"] }
 pulldown-cmark-to-cmark = "^6.0.0"
 path-clean = "^0.1.0"

@@ -17,7 +17,6 @@ pub fn run(matches: &ArgMatches) -> Result<i32> {
         ("untag", Some(m)) => subcommands::untag::run(m),
         ("mv", Some(m)) => subcommands::mv::run(m),
         ("backlink", Some(_)) => subcommands::backlink::run(),
-        ("graph", Some(_)) => subcommands::graph::run(),
         _ => Ok(0),
     }
 }

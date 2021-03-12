@@ -2,6 +2,7 @@
 
 - **[Breaking Change]** `tags`, `backlink`, and `mv` (when updating links to a moved note) now ignore notes that are hidden files, that match patterns in a `.ignore` file, or that match patterns in a `.gitignore` file (if running in a path that has a git repository).
 - `tags`, `backlinks`, and `mv` should now run substantially faster in some environments thanks to the introduction of concurrency.
+- **[Breaking Change]** Removed the `graph` subcommand.
 
 # v0.5.1
 
