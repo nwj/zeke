@@ -100,12 +100,6 @@ Unlinking notes works in a similar manner:
 $ zeke unlink one.md two.md
 ```
 
-A representation of the network of links between your notes is available via the `graph` command. The output is in the DOT format, which can be used by GraphViz to generate charts.
-
-```
-$ zeke graph | dot -Tsvg > graph.svg
-```
-
 ## Installation
 
 ### From Source Code

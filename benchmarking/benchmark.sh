@@ -7,7 +7,6 @@ DIR_SIZE=1000
 
 # Commands to benchmark
 COMMAND_BACKLINK="zeke backlink"
-COMMAND_GRAPH="zeke graph"
 COMMAND_MV="zeke mv"
 COMMAND_TAGS="zeke tags"
 
@@ -32,7 +31,6 @@ echo -e "$(tput el)Created $DIR_SIZE temp files.\n"
 
 hyperfine --warmup $WARMUP_COUNT --min-runs $MIN_RUNS \
 	"$COMMAND_BACKLINK" \
-	"$COMMAND_GRAPH" \
 	"$COMMAND_MV \$(ls | head -n 1) \$RANDOM\$RANDOM" \
 	"$COMMAND_TAGS"
 

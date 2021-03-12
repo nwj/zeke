@@ -56,12 +56,6 @@ impl ZekeTester {
         Ok(cmd)
     }
 
-    pub fn zeke_graph(&self) -> Result<Command> {
-        let mut cmd = self.zeke()?;
-        cmd.arg("graph");
-        Ok(cmd)
-    }
-
     pub fn zeke_mv(&self, path: &str, title: &str) -> Result<Command> {
         let mut cmd = self.zeke()?;
         cmd.arg("mv").arg(path).arg(title);
