@@ -31,7 +31,7 @@ impl FrontMatter {
 
     pub fn to_yaml_string(&self) -> Result<String> {
         let yaml = serde_yaml::to_string(&self)?;
-        Ok(format!("{}\n---", yaml))
+        Ok(format!("{}---", yaml))
     }
 
     pub fn from_yaml_string(s: String) -> Result<FrontMatter> {
