@@ -1,6 +1,6 @@
 [package]
 name = "zeke"
-version = "0.5.1"
+version = "0.6.0"
 authors = ["Nick Willett-Jeffries <hello@nwj.cc>"]
 edition = "2018"
 description = "Zeke is a CLI for managing a knowledge base built on a local folder of plain text Markdown files."
