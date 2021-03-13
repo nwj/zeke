@@ -7,7 +7,7 @@
 - **[Breaking Change]** `tags`, `backlink`, and `mv` (when updating links to a moved note) now ignore notes that are hidden files, that match patterns in a `.ignore` file, or that match patterns in a `.gitignore` file (if running in a path that has a git repository).
 - **[Breaking Change]** Removed the `graph` subcommand.
 - `tags`, `backlinks`, and `mv` now perform some file I/O in parallel.
-- `new -e` can now uses the `EDITOR` environment variable. If both `ZEKE_EDITOR` and `EDITOR` are set, then `ZEKE_EDITOR` is used.
+- `new -e` can now use the `EDITOR` environment variable. If both `ZEKE_EDITOR` and `EDITOR` are set, then `ZEKE_EDITOR` is used.
 - Editor commands (set via `ZEKE_EDITOR` or `EDITOR`) may now include arguments. Prior to this behavior, any provided arguments were discarded.
 
 # v0.5.1
