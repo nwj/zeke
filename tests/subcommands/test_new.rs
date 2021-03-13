@@ -41,6 +41,23 @@ fn does_not_overwrite_existing_files() -> Result<()> {
 }
 
 #[test]
+fn spawns_zeke_editor_process_if_edit_flag() -> Result<()> {
+    let t = ZekeTester::new();
+    let title = "foo";
+
+    let output = t
+        .zeke_new(title)?
+        .arg("-e")
+        .env_clear()
+        .env("ZEKE_EDITOR", "echo")
+        .output()?;
+    let stdout = str::from_utf8(&output.stdout)?;
+    assert_eq!(stdout.matches(title).count(), 1);
+
+    Ok(())
+}
+
+#[test]
 fn spawns_editor_process_if_edit_flag() -> Result<()> {
     let t = ZekeTester::new();
     let title = "foo";
@@ -48,7 +65,26 @@ fn spawns_editor_process_if_edit_flag() -> Result<()> {
     let output = t
         .zeke_new(title)?
         .arg("-e")
+        .env_clear()
+        .env("EDITOR", "echo")
+        .output()?;
+    let stdout = str::from_utf8(&output.stdout)?;
+    assert_eq!(stdout.matches(title).count(), 1);
+
+    Ok(())
+}
+
+#[test]
+fn prefers_zeke_editor_to_editor_if_edit_flag() -> Result<()> {
+    let t = ZekeTester::new();
+    let title = "foo";
+
+    let output = t
+        .zeke_new(title)?
+        .arg("-e")
+        .env_clear()
         .env("ZEKE_EDITOR", "echo")
+        .env("EDITOR", "true")
         .output()?;
     let stdout = str::from_utf8(&output.stdout)?;
     assert_eq!(stdout.matches(title).count(), 1);

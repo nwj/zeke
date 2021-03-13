@@ -21,7 +21,8 @@ pub fn run(matches: &ArgMatches) -> Result<i32> {
 
     if matches.is_present("edit") {
         let cmd = env::var("ZEKE_EDITOR")
-            .with_context(|| "Failed to start editor process. Check that the ZEKE_EDITOR environment variable is set.")?;
+            .or_else(|_| env::var("EDITOR"))
+            .with_context(|| "Failed to start editor process. Check that either the EDITOR or ZEKE_EDITOR environment variable is set.")?;
         Command::new(&cmd)
             .arg(&path)
             .spawn()

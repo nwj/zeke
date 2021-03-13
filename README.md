@@ -27,10 +27,10 @@ $ cat 20200502-my_note.md
 
 Notes are Markdown files, named using a date and a formatted version of the note title. Each note includes YAML front-matter with basic meta-data.
 
-The optional `-e` flag will open the new note in whichever editor you specify using the `ZEKE_EDITOR` environment variable.
+The optional `-e` flag will open the new note in whichever editor is specified by your `EDITOR` or `ZEKE_EDITOR` environment variables. If both are set, `ZEKE_EDITOR` will take precedence over `EDITOR`.
 
 ```
-$ export ZEKE_EDITOR="vim"
+$ export EDITOR="vim"
 $ zeke new -e "My Note"
 ```
 

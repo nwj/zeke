@@ -19,7 +19,7 @@ fn main() {
                 .arg(
                     Arg::with_name("edit")
                         .short("e")
-                        .help("Opens the new note in the editor specified by the $ZEKE_EDITOR env variable")
+                        .help("Opens the new note in the editor specified by the EDITOR or ZEKE_EDITOR env variables")
                         .long("edit")
                 )
                 .display_order(1)
