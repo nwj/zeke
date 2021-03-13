@@ -1,6 +1,6 @@
 use crate::fs::write_note;
 use crate::note::Note;
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use clap::ArgMatches;
 use std::env;
 use std::process::Command;
@@ -20,15 +20,27 @@ pub fn run(matches: &ArgMatches) -> Result<i32> {
     eprintln!("Created `{}`.", path.to_string_lossy());
 
     if matches.is_present("edit") {
-        let cmd = env::var("ZEKE_EDITOR")
-            .or_else(|_| env::var("EDITOR"))
-            .with_context(|| "Failed to start editor process. Check that either the EDITOR or ZEKE_EDITOR environment variable is set.")?;
-        Command::new(&cmd)
+        get_editor()
+            .with_context(|| "Failed to start editor process. Check that either the EDITOR or ZEKE_EDITOR environment variables are set.")?
             .arg(&path)
             .spawn()
-            .with_context(|| format!("Failed to start editor process `{}`.", &cmd))?
+            .with_context(|| "Failed to start editor process.")?
             .wait()?;
     }
 
     Ok(0)
+}
+
+fn get_editor() -> Result<Command> {
+    let cmd_unparsed = env::var("ZEKE_EDITOR").or_else(|_| env::var("EDITOR"))?;
+
+    let cmd_parts = shell_words::split(&cmd_unparsed)?;
+    match cmd_parts.split_first() {
+        Some((bin, args)) => {
+            let mut cmd = Command::new(bin);
+            cmd.args(args);
+            Ok(cmd)
+        }
+        None => Err(anyhow!("Failed to parse editor command.")),
+    }
 }
