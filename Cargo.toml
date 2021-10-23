@@ -2,7 +2,7 @@
 name = "zeke"
 version = "0.6.0"
 authors = ["Nick Willett-Jeffries <hello@nwj.cc>"]
-edition = "2018"
+edition = "2021"
 description = "Zeke is a CLI for managing a knowledge base built on a local folder of plain text Markdown files."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
