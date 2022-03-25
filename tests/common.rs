@@ -15,7 +15,7 @@ fn without_args() -> Result<()> {
         .failure()
         .stderr(predicate::str::contains("zeke"))
         .stderr(predicate::str::contains("USAGE:"))
-        .stderr(predicate::str::contains("FLAGS:"))
+        .stderr(predicate::str::contains("OPTIONS:"))
         .stderr(predicate::str::contains("SUBCOMMANDS:"));
 
     Ok(())

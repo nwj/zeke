@@ -1,7 +1,7 @@
 [package]
 name = "zeke"
 version = "0.6.0"
-authors = ["Nick Willett-Jeffries <hello@nwj.cc>"]
+authors = ["Nick Willett-Jeffries <nwillettjeffries@gmail.com>"]
 edition = "2021"
 description = "Zeke is a CLI for managing a knowledge base built on a local folder of plain text Markdown files."
 
@@ -9,9 +9,9 @@ description = "Zeke is a CLI for managing a knowledge base built on a local fold
 
 [dependencies]
 chrono = { version = "^0.4.19", features = ["serde"] }
-clap = "^2.33.2"
+clap = { version = "^3.1.6", features = ["derive"] }
 regex = "^1.4.4"
-serde = { version = "^1.0.124", features = ["derive"] }
+serde = { version = "^1.0.136", features = ["derive"] }
 serde_yaml = "^0.8.17"
 pulldown-cmark = { version = "^0.8.0", default-features = false, features = ["simd"] }
 pulldown-cmark-to-cmark = "^6.0.0"

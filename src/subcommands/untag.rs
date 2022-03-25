@@ -1,23 +1,12 @@
 use crate::fs::{read_note, write_note};
 use anyhow::Result;
-use clap::ArgMatches;
 use std::path::PathBuf;
 
-pub fn run(matches: &ArgMatches) -> Result<i32> {
-    let tag = match matches.value_of("TAG") {
-        Some(s) => s.to_string(),
-        _ => unreachable!(),
-    };
-
-    let paths: Vec<PathBuf> = match matches.values_of_lossy("FILE") {
-        Some(v) => v.into_iter().map(|s| PathBuf::from(s)).collect(),
-        _ => unreachable!(),
-    };
-
+pub fn run(tag: &str, paths: &Vec<PathBuf>) -> Result<i32> {
     for path in paths.iter() {
         let mut note = read_note(&path)?;
 
-        if note.front_matter.tags.remove(&tag) {
+        if note.front_matter.tags.remove(tag) {
             write_note(&note, false)?;
         }
     }

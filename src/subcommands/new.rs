@@ -1,25 +1,19 @@
 use crate::fs::write_note;
 use crate::note::Note;
 use anyhow::{anyhow, Context, Result};
-use clap::ArgMatches;
 use std::env;
 use std::process::Command;
 
-pub fn run(matches: &ArgMatches) -> Result<i32> {
-    let title = match matches.value_of("TITLE") {
-        Some(s) => s.to_string(),
-        _ => unreachable!(),
-    };
-
+pub fn run(title: &str, edit_flag: &bool) -> Result<i32> {
     let mut note = Note::new();
-    note.front_matter.title = title;
+    note.front_matter.title = title.to_string();
     let path = note.generate_path();
     note.path = Some(path.clone());
 
     write_note(&note, true)?;
     eprintln!("Created `{}`.", path.to_string_lossy());
 
-    if matches.is_present("edit") {
+    if *edit_flag {
         get_editor()
             .with_context(|| "Failed to start editor process. Check that either the EDITOR or ZEKE_EDITOR environment variables are set.")?
             .arg(&path)

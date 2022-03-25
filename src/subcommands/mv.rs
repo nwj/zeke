@@ -1,24 +1,15 @@
 use crate::fs::{read_dir, read_note, write_note};
 use anyhow::{Context, Result};
-use clap::ArgMatches;
 use path_clean::PathClean;
 use rayon::prelude::*;
 use std::fs::remove_file;
 use std::path::PathBuf;
 
-pub fn run(matches: &ArgMatches) -> Result<i32> {
-    let old_path = match matches.value_of("FILE") {
-        Some(s) => PathBuf::from(s).clean(),
-        _ => unreachable!(),
-    };
-
-    let new_title = match matches.value_of("TITLE") {
-        Some(s) => s.to_string(),
-        _ => unreachable!(),
-    };
+pub fn run(path: &PathBuf, title: &str) -> Result<i32> {
+    let old_path = path.clean();
 
     let mut note = read_note(&old_path)?;
-    note.front_matter.title = new_title;
+    note.front_matter.title = title.to_string();
     let new_path = note.generate_path();
     note.path = Some(new_path.clone());
     write_note(&note, true)?;
