@@ -52,7 +52,7 @@ impl Content {
             }
             _ => event,
         });
-        cmark(md, &mut s, None)?;
+        cmark(md, &mut s)?;
         Ok(Content::from(s))
     }
 
