@@ -31,11 +31,11 @@ impl FrontMatter {
 
     pub fn to_yaml_string(&self) -> Result<String> {
         let yaml = serde_yaml::to_string(&self)?;
-        Ok(format!("{}---", yaml))
+        Ok(format!("---\n{}---", yaml))
     }
 
     pub fn from_yaml_string(s: String) -> Result<FrontMatter> {
-        let trimmed = s.trim_end().trim_end_matches("---").trim_end();
+        let trimmed = s.trim().trim_end().trim_end_matches("---").trim_end();
         let mut front_matter: FrontMatter = serde_yaml::from_str(&trimmed)?;
         front_matter.links = front_matter.links.iter().map(|l| l.clean()).collect();
         Ok(front_matter)

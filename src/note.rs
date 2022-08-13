@@ -72,7 +72,7 @@ mod tests {
 
     #[test]
     fn from_string_no_content() -> Result<()> {
-        let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: \"2020-04-08T00:05:56.075997Z\"\ntags:\n  - cats\nlinks: []\n---";
+        let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: 2020-04-08T00:05:56.075997Z\ntags:\n- cats\nlinks: []\n---";
         let (front_matter, content) = Note::from_string(s.to_string())?;
         let a = Note {
             front_matter,

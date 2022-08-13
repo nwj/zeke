@@ -14,7 +14,7 @@ fn tags_the_note() -> Result<()> {
     t.zeke_tag(tag, path)?.assert().success();
     t.temp_dir
         .child(path)
-        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)));
+        .assert(predicate::str::contains(format!("tags:\n- {}\n", tag,)));
 
     Ok(())
 }
@@ -31,10 +31,10 @@ fn can_tag_multiple_notes() -> Result<()> {
     t.zeke_tag(tag, path)?.arg(path2).assert().success();
     t.temp_dir
         .child(path)
-        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)));
+        .assert(predicate::str::contains(format!("tags:\n- {}\n", tag,)));
     t.temp_dir
         .child(path2)
-        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)));
+        .assert(predicate::str::contains(format!("tags:\n- {}\n", tag,)));
 
     Ok(())
 }
@@ -58,10 +58,10 @@ fn does_not_modify_other_file_content() -> Result<()> {
     let tag = "dogs";
     let content = "---
 title: Sint omnis et qui qui
-created: \"2020-04-19T18:23:24.774140Z\"
+created: 2020-04-19T18:23:24.774140Z
 tags: []
 links:
-  - b.md
+- b.md
 foo: bar
 ---
 Perspiciatis dolores corrupti sit.
@@ -72,7 +72,7 @@ Esse cumque saepe laboriosam.";
     t.zeke_tag(tag, path)?.assert().success();
     t.temp_dir
         .child(path)
-        .assert(content.replace("tags: []", &format!("tags:\n  - {}", tag)));
+        .assert(content.replace("tags: []", &format!("tags:\n- {}", tag)));
 
     Ok(())
 }

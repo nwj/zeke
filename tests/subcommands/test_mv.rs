@@ -56,8 +56,8 @@ fn updates_front_matter_linked_notes() -> Result<()> {
     t.zeke_mv("20201010-a.md", "C")?.assert().success();
     t.temp_dir
         .child("20201010-b.md")
-        .assert(predicate::str::contains("links:\n  - 20201010-a.md\n").not())
-        .assert(predicate::str::contains("links:\n  - 20201010-c.md\n"));
+        .assert(predicate::str::contains("links:\n- 20201010-a.md\n").not())
+        .assert(predicate::str::contains("links:\n- 20201010-c.md\n"));
 
     Ok(())
 }
@@ -85,7 +85,7 @@ fn does_not_modify_other_parts_of_linked_notes() -> Result<()> {
     t.zeke_mv("20201010-a.md", "C")?.assert().success();
     t.temp_dir
         .child("20201010-b.md")
-        .assert(initial_content.replace("links:\n  - 20201010-a.md", "links:\n  - 20201010-c.md"));
+        .assert(initial_content.replace("links:\n- 20201010-a.md", "links:\n- 20201010-c.md"));
 
     Ok(())
 }
@@ -160,8 +160,8 @@ fn updates_links_in_gitignored_files_if_no_git() -> Result<()> {
     t.zeke_mv("20201010-a.md", "C")?.assert().success();
     t.temp_dir
         .child("20201010-b.md")
-        .assert(predicate::str::contains("links:\n  - 20201010-a.md\n").not())
-        .assert(predicate::str::contains("links:\n  - 20201010-c.md\n"));
+        .assert(predicate::str::contains("links:\n- 20201010-a.md\n").not())
+        .assert(predicate::str::contains("links:\n- 20201010-c.md\n"));
 
     Ok(())
 }

@@ -16,13 +16,13 @@ fn links_both_notes() -> Result<()> {
     t.temp_dir
         .child(path_a)
         .assert(predicate::str::contains(format!(
-            "links:\n  - {}\n",
+            "links:\n- {}\n",
             path_b,
         )));
     t.temp_dir
         .child(path_b)
         .assert(predicate::str::contains(format!(
-            "links:\n  - {}\n",
+            "links:\n- {}\n",
             path_a,
         )));
 
@@ -40,7 +40,7 @@ fn fails_without_extant_path_a() -> Result<()> {
     t.temp_dir.child(path_a).assert(predicate::path::missing());
     t.temp_dir
         .child(path_b)
-        .assert(predicate::str::contains(format!("links:\n  - {}\n", path_a)).not());
+        .assert(predicate::str::contains(format!("links:\n- {}\n", path_a)).not());
 
     Ok(())
 }
@@ -55,7 +55,7 @@ fn fails_without_extant_path_b() -> Result<()> {
     t.zeke_link(path_a, path_b)?.assert().failure();
     t.temp_dir
         .child(path_a)
-        .assert(predicate::str::contains(format!("links:\n  - {}\n", path_b)).not());
+        .assert(predicate::str::contains(format!("links:\n- {}\n", path_b)).not());
     t.temp_dir.child(path_b).assert(predicate::path::missing());
 
     Ok(())
@@ -68,14 +68,14 @@ fn does_not_modify_other_file_content() -> Result<()> {
     let path_b = "b.md";
     let content = "---
 title: Sint omnis et qui qui
-created: \"2020-04-19T18:23:24.774140Z\"
+created: 2020-04-19T18:23:24.774140Z
 tags:
-  - quisquam
+- quisquam
 links: []
 foobar:
-  - foo
-  - 123
-  - false
+- foo
+- 123
+- false
 ---
 Perspiciatis dolores corrupti sit.
 Esse cumque saepe laboriosam.";
@@ -86,10 +86,10 @@ Esse cumque saepe laboriosam.";
     t.zeke_link(path_a, path_b)?.assert().success();
     t.temp_dir
         .child(path_a)
-        .assert(content.replace("links: []", &format!("links:\n  - {}", path_b)));
+        .assert(content.replace("links: []", &format!("links:\n- {}", path_b)));
     t.temp_dir
         .child(path_b)
-        .assert(content.replace("links: []", &format!("links:\n  - {}", path_a)));
+        .assert(content.replace("links: []", &format!("links:\n- {}", path_a)));
 
     Ok(())
 }

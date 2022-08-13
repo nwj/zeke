@@ -19,7 +19,7 @@ Created `20200502-my_note.md` note file
 $ cat 20200502-my_note.md
  ---
  title: My Note
- created: "2020-05-02T21:48:27.450966Z"
+ created: 2020-05-02T21:48:27.450966Z
  tags: []
  links: []
  ---
@@ -42,7 +42,7 @@ Tagged `20200502-my_note.md` with `my-tag`
 $ cat 20200502-my_note.md
 ---
 title: My Note
-created: "2020-05-02T22:06:27.479009Z"
+created: 2020-05-02T22:06:27.479009Z
 tags:
   - my-tag
 links: []
@@ -76,19 +76,19 @@ Linked `one.md` to `two.md`
 $ cat one.md
 ---
 title: one
-created: "2020-05-02T22:24:35.253945Z"
+created: 2020-05-02T22:24:35.253945Z
 tags: []
 links: []
-  - two.md
+- two.md
 ---
 
 $ cat two.md
 ---
 title: two
-created: "2020-05-02T22:24:38.706218Z"
+created: 2020-05-02T22:24:38.706218Z
 tags: []
 links:
-  - one.md
+- one.md
 ---
 ```
 

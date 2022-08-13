@@ -12,9 +12,9 @@ fn untags_the_note() -> Result<()> {
     let content = format!(
         "---
 title: Sint omnis et qui qui
-created: \"2020-04-19T18:23:24.774140Z\"
+created: 2020-04-19T18:23:24.774140Z
 tags:
-  - {}
+- {}
 links: []
 ---
 Perspiciatis dolores corrupti sit.
@@ -26,7 +26,7 @@ Esse cumque saepe laboriosam.",
     t.zeke_untag(tag, path)?.assert().success();
     t.temp_dir
         .child(path)
-        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)).not());
+        .assert(predicate::str::contains(format!("tags:\n- {}\n", tag,)).not());
 
     Ok(())
 }
@@ -40,9 +40,9 @@ fn can_untag_multiple_notes() -> Result<()> {
     let content = format!(
         "---
 title: Sint omnis et qui qui
-created: \"2020-04-19T18:23:24.774140Z\"
+created: 2020-04-19T18:23:24.774140Z
 tags:
-  - {}
+- {}
 links: []
 ---
 Perspiciatis dolores corrupti sit.
@@ -55,10 +55,10 @@ Esse cumque saepe laboriosam.",
     t.zeke_untag(tag, path)?.arg(path2).assert().success();
     t.temp_dir
         .child(path)
-        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)).not());
+        .assert(predicate::str::contains(format!("tags:\n- {}\n", tag,)).not());
     t.temp_dir
         .child(path2)
-        .assert(predicate::str::contains(format!("tags:\n  - {}\n", tag,)).not());
+        .assert(predicate::str::contains(format!("tags:\n- {}\n", tag,)).not());
 
     Ok(())
 }
@@ -83,11 +83,11 @@ fn does_not_modify_other_file_content() -> Result<()> {
     let content = format!(
         "---
 title: Sint omnis et qui qui
-created: \"2020-04-19T18:23:24.774140Z\"
+created: 2020-04-19T18:23:24.774140Z
 tags:
-  - {}
+- {}
 links:
-  - b.md
+- b.md
 color: purple
 ---
 Perspiciatis dolores corrupti sit.
@@ -99,7 +99,7 @@ Esse cumque saepe laboriosam.",
     t.zeke_untag(tag, path)?.assert().success();
     t.temp_dir
         .child(path)
-        .assert(content.replace(&format!("tags:\n  - {}", tag), "tags: []"));
+        .assert(content.replace(&format!("tags:\n- {}", tag), "tags: []"));
 
     Ok(())
 }

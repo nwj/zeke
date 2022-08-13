@@ -6,16 +6,16 @@ function create_note () {
   local link="$3"
 
   local file_content
-  file_content="---\ntitle: ${file_name}\ncreated: \"2021-09-07T16:44:27.201207Z\"\n"
+  file_content="---\ntitle: ${file_name}\ncreated: 2021-09-07T16:44:27.201207Z\n"
 
   if [[ -n "${tag}" ]]; then
-    file_content+="tags:\n  - ${tag}\n"
+    file_content+="tags:\n- ${tag}\n"
   else
     file_content+="tags: []\n"
   fi
 
   if [[ -n "${link}" ]]; then
-    file_content+="links:\n  - ${link}\n"
+    file_content+="links:\n- ${link}\n"
   else
     file_content+="links: []\n"
   fi

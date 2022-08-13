@@ -48,7 +48,7 @@ fn does_not_modify_other_parts_of_linked_notes() -> Result<()> {
     t.zeke_backlink()?.assert().success();
     t.temp_dir
         .child("20201024-b.md")
-        .assert(initial_content.replace("links: []", "links:\n  - 20201024-a.md"));
+        .assert(initial_content.replace("links: []", "links:\n- 20201024-a.md"));
 
     Ok(())
 }
@@ -125,7 +125,7 @@ fn finds_links_in_gitignored_files_if_no_git() -> Result<()> {
     t.zeke_backlink()?.assert().success();
     t.temp_dir
         .child("20201223-b.md")
-        .assert(initial_content.replace("links: []", "links:\n  - 20201223-a.md"));
+        .assert(initial_content.replace("links: []", "links:\n- 20201223-a.md"));
 
     Ok(())
 }
