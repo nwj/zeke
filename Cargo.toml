@@ -8,21 +8,21 @@ description = "Zeke is a CLI for managing a knowledge base built on a local fold
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = { version = "^0.4.19", features = ["serde"] }
-clap = { version = "^3.1.6", features = ["derive"] }
-regex = "^1.4.4"
-serde = { version = "^1.0.136", features = ["derive"] }
-serde_yaml = "^0.8.17"
+chrono = { version = "^0.4.22", features = ["serde"] }
+clap = { version = "^3.2.17", features = ["derive"] }
+regex = "^1.6.0"
+serde = { version = "^1.0.143", features = ["derive"] }
+serde_yaml = "^0.8.26"
 pulldown-cmark = { version = "^0.8.0", default-features = false, features = ["simd"] }
-pulldown-cmark-to-cmark = "^6.0.0"
+pulldown-cmark-to-cmark = "^6.0.4"
 path-clean = "^0.1.0"
-anyhow = "^1.0.38"
-ignore="^0.4.17"
-rayon = "^1.5.0"
-shell-words = "^1.0.0"
+anyhow = "^1.0.61"
+ignore="^0.4.18"
+rayon = "^1.5.3"
+shell-words = "^1.1.0"
 
 [dev-dependencies]
-assert_cmd = "^1.0.3"
-assert_fs = "^1.0.1"
-predicates = "^1.0.7"
+assert_cmd = "^2.0.4"
+assert_fs = "^1.0.7"
+predicates = "^2.1.1"
 proptest = "^1.0.0"
