@@ -10,74 +10,67 @@ mod note;
 mod subcommands;
 
 #[derive(Parser)]
-#[clap(version, about)]
+#[command(version, about)]
 struct Cli {
-    #[clap(subcommand)]
+    #[command(subcommand)]
     command: Commands,
 }
 
 #[derive(Subcommand)]
 enum Commands {
-    #[clap(display_order = 1)]
+    #[command(display_order = 1)]
     /// Create a new note
     New {
         /// Title for the new note
         title: String,
         /// Open the new note in the editor specified by the EDITOR or ZEKE_EDITOR env variables
-        #[clap(long, short)]
+        #[arg(long, short)]
         edit: bool,
     },
-    #[clap(display_order = 2)]
+    #[command(display_order = 2)]
     /// Rename a note and update references to the old name
     Mv {
-        #[clap(parse(from_os_str))]
         /// Path to the note to move
         path: PathBuf,
         /// New title for the note
         title: String,
     },
-    #[clap(display_order = 3)]
+    #[command(display_order = 3)]
     /// Tag one or more notes
     Tag {
         /// Tag to apply to the note(s)
         tag: String,
-        #[clap(parse(from_os_str))]
         /// Path(s) for the note(s) to tag
         paths: Vec<PathBuf>,
     },
-    #[clap(display_order = 4)]
+    #[command(display_order = 4)]
     /// Remove a tag from one or more notes
     Untag {
         /// Tag to remove from the note(s)
         tag: String,
-        #[clap(parse(from_os_str))]
         /// Path(s) for the note(s) to untag
         paths: Vec<PathBuf>,
     },
-    #[clap(display_order = 5)]
+    #[command(display_order = 5)]
     /// List all tags
     Tags,
-    #[clap(display_order = 6)]
+    #[command(display_order = 6)]
     /// Link a note to another note
     Link {
-        #[clap(parse(from_os_str))]
         /// Path to one note to link
         path_a: PathBuf,
-        #[clap(parse(from_os_str))]
         /// Path to the other note to link
         path_b: PathBuf,
     },
-    #[clap(display_order = 7)]
+    #[command(display_order = 7)]
     /// Unlink a note from another note
     Unlink {
-        #[clap(parse(from_os_str))]
         /// Path to one note to unlink
         path_a: PathBuf,
-        #[clap(parse(from_os_str))]
         /// Path to the other note to unlink
         path_b: PathBuf,
     },
-    #[clap(display_order = 8)]
+    #[command(display_order = 8)]
     /// Add backlinks to the front matter of all notes
     Backlink,
 }

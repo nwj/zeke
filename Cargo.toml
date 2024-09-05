@@ -10,7 +10,7 @@ description = "Zeke is a CLI for managing a knowledge base built on a local fold
 [dependencies]
 anyhow = "1.0.86"
 chrono = { version = "0.4.38", features = ["serde"] }
-clap = { version = "3.2.25", features = ["derive"] }
+clap = { version = "4.5.17", features = ["derive"] }
 ignore = "0.4.22"
 path-clean = "1.0.1"
 pulldown-cmark = { version = "0.9.6", default-features = false, features = ["simd"] }
