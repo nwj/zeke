@@ -3,6 +3,10 @@
 _default:
 	@just --list
 
+# Audits the app's dependencies for security vulnerabilities and unpermitted licenses
+audit:
+	cargo deny check advisories && cargo deny check licenses
+
 # Lints the codebase (via clippy)
 check:
 	cargo clippy
