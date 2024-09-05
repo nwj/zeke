@@ -12,10 +12,10 @@ parameters:
     # parameters so when cargo-deny-version changes, make sure to also update
     # cargo-deny-cache-key so that it matches the new version.
     type: string
-    default: "0.14.24"
+    default: "0.16.1"
   cargo-deny-cache-key:
     type: string
-    default: "v0-cargo-deny-{{ arch }}-0.14.24"
+    default: "v0-cargo-deny-{{ arch }}-0.16.1"
 
 jobs:
   lint-and-test:
