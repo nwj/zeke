@@ -1,0 +1,78 @@
+version: 2.1
+
+parameters:
+  rust-version:
+    type: string
+    default: "1.80"
+  target-cache-key:
+    type: string
+    default: "v0-target-{{ arch }}-{{ checksum \"Cargo.lock\" }}"
+  cargo-deny-version:
+    # CircleCI doesn't seem to have a way to build parameters from other
+    # parameters so when cargo-deny-version changes, make sure to also update
+    # cargo-deny-cache-key so that it matches the new version.
+    type: string
+    default: "0.14.24"
+  cargo-deny-cache-key:
+    type: string
+    default: "v0-cargo-deny-{{ arch }}-0.14.24"
+
+jobs:
+  lint-and-test:
+    docker:
+      - image: cimg/rust:<< pipeline.parameters.rust-version >>
+    steps:
+      - checkout
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      - run:
+          name: Formatting
+          command: cargo fmt --check
+      - restore_cache:
+          keys:
+            - << pipeline.parameters.target-cache-key >>
+      - run:
+          name: Linting
+          command: cargo clippy --locked
+      - run:
+          name: Testing
+          command: cargo test --locked
+      - save_cache:
+          paths:
+            - ./target
+          key: << pipeline.parameters.target-cache-key >>
+
+  audit:
+    docker:
+      - image: cimg/rust:<< pipeline.parameters.rust-version >>
+    steps:
+      - checkout
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      - restore_cache:
+          keys:
+            - << pipeline.parameters.cargo-deny-cache-key >>
+      - run:
+          name: Installing cargo deny
+          # The `|| true` at the end here is necessary because cargo install exits with an error status
+          # on the CI nodes when the package is already installed (i.e. when we pulled it out of cache).
+          # Oddly, I have been unable to replicate that exit status behavior locally.
+          command: cargo install cargo-deny@<< pipeline.parameters.cargo-deny-version >> --locked || true
+      - save_cache:
+          paths:
+            - /home/circleci/.cargo/bin/cargo-deny
+          key: << pipeline.parameters.cargo-deny-cache-key >>
+      - run:
+          name: Advisories auditing
+          command: cargo deny check advisories
+      - run:
+          name: Licenses auditing
+          command: cargo deny check licenses
+
+workflows:
+  main:
+    jobs:
+      - lint-and-test
+      - audit
