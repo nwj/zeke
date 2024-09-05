@@ -72,7 +72,7 @@ mod tests {
 
     #[test]
     fn from_string_no_content() -> Result<()> {
-        let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: 2020-04-08T00:05:56.075997Z\ntags:\n- cats\nlinks: []\n---";
+        let s = "---\ntitle: \"Lorem ipsum dolor sit amet\"\ncreated: 2020-04-08T00:05:56Z\ntags:\n- cats\nlinks: []\n---";
         let (front_matter, content) = Note::from_string(s.to_string())?;
         let a = Note {
             front_matter,
@@ -84,7 +84,7 @@ mod tests {
         let b = Note {
             front_matter: FrontMatter {
                 title: String::from("Lorem ipsum dolor sit amet"),
-                created: Some(Utc.ymd(2020, 4, 8).and_hms_micro(0, 5, 56, 75_997)),
+                created: Some(Utc.with_ymd_and_hms(2020, 4, 8, 0, 5, 56).unwrap()),
                 tags: ts,
                 links: HashSet::new(),
                 extra: HashMap::new(),
@@ -154,7 +154,7 @@ mod tests {
         let n = Note {
             front_matter: FrontMatter {
                 title: String::from("This is a test"),
-                created: Some(Utc.ymd(2020, 4, 8).and_hms_micro(0, 5, 56, 75_997)),
+                created: Some(Utc.with_ymd_and_hms(2020, 4, 8, 0, 5, 56).unwrap()),
                 tags: HashSet::new(),
                 links: HashSet::new(),
                 extra: HashMap::new(),
@@ -207,7 +207,7 @@ mod tests {
         // The dates here are 1900-01-01 to 2200-01-01. Limited to this range because chrono panics
         // on some values in the full i64 (for sec) and u32 (for nsec) range.
         fn arb_datetime() (s in -2_208_988_800..7_258_118_400i64, ns in 0..1_000_000_000u32) -> DateTime<Utc> {
-            Utc.timestamp(s, ns)
+            Utc.timestamp_opt(s, ns).unwrap()
         }
     }
 

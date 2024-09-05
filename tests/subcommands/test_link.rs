@@ -15,16 +15,10 @@ fn links_both_notes() -> Result<()> {
     t.zeke_link(path_a, path_b)?.assert().success();
     t.temp_dir
         .child(path_a)
-        .assert(predicate::str::contains(format!(
-            "links:\n- {}\n",
-            path_b,
-        )));
+        .assert(predicate::str::contains(format!("links:\n- {}\n", path_b,)));
     t.temp_dir
         .child(path_b)
-        .assert(predicate::str::contains(format!(
-            "links:\n- {}\n",
-            path_a,
-        )));
+        .assert(predicate::str::contains(format!("links:\n- {}\n", path_a,)));
 
     Ok(())
 }

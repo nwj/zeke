@@ -106,9 +106,7 @@ fn does_not_find_links_in_gitignored_files_if_git() -> Result<()> {
     t.temp_dir.child(".git").create_dir_all()?;
 
     t.zeke_backlink()?.assert().success();
-    t.temp_dir
-        .child("20201223-b.md")
-        .assert(initial_content);
+    t.temp_dir.child("20201223-b.md").assert(initial_content);
 
     Ok(())
 }

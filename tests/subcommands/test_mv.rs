@@ -97,9 +97,7 @@ fn only_updates_links_in_markdown_files() -> Result<()> {
     let initial_content = fs::read_to_string(t.temp_dir.child("20201010-b.txt").path())?;
 
     t.zeke_mv("20201010-a.md", "C")?.assert().success();
-    t.temp_dir
-        .child("20201010-b.txt")
-        .assert(initial_content);
+    t.temp_dir.child("20201010-b.txt").assert(initial_content);
 
     Ok(())
 }
@@ -111,9 +109,7 @@ fn does_not_update_links_in_hidden_files() -> Result<()> {
     let initial_content = fs::read_to_string(t.temp_dir.child(".20201010-b.md").path())?;
 
     t.zeke_mv("20201010-a.md", "C")?.assert().success();
-    t.temp_dir
-        .child(".20201010-b.md")
-        .assert(initial_content);
+    t.temp_dir.child(".20201010-b.md").assert(initial_content);
 
     Ok(())
 }
@@ -125,9 +121,7 @@ fn does_not_update_links_in_ignored_files() -> Result<()> {
     let initial_content = fs::read_to_string(t.temp_dir.child("20201010-b.md").path())?;
 
     t.zeke_mv("20201010-a.md", "C")?.assert().success();
-    t.temp_dir
-        .child("20201010-b.md")
-        .assert(initial_content);
+    t.temp_dir.child("20201010-b.md").assert(initial_content);
 
     Ok(())
 }
@@ -142,9 +136,7 @@ fn does_not_update_links_in_gitignored_files_if_git() -> Result<()> {
     t.temp_dir.child(".git").create_dir_all()?;
 
     t.zeke_mv("20201010-a.md", "C")?.assert().success();
-    t.temp_dir
-        .child("20201010-b.md")
-        .assert(initial_content);
+    t.temp_dir.child("20201010-b.md").assert(initial_content);
 
     Ok(())
 }

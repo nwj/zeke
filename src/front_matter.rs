@@ -36,7 +36,7 @@ impl FrontMatter {
 
     pub fn from_yaml_string(s: String) -> Result<FrontMatter> {
         let trimmed = s.trim().trim_end().trim_end_matches("---").trim_end();
-        let mut front_matter: FrontMatter = serde_yaml::from_str(&trimmed)?;
+        let mut front_matter: FrontMatter = serde_yaml::from_str(trimmed)?;
         front_matter.links = front_matter.links.iter().map(|l| l.clean()).collect();
         Ok(front_matter)
     }
@@ -65,7 +65,7 @@ mod tests {
         // The dates here are 1900-01-01 to 2200-01-01. Limited to this range because chrono panics
         // on some values in the full i64 (for sec) and u32 (for nsec) range.
         fn arb_datetime() (s in -2_208_988_800..7_258_118_400i64, ns in 0..1_000_000_000u32) -> DateTime<Utc> {
-            Utc.timestamp(s, ns)
+            Utc.timestamp_opt(s, ns).unwrap()
         }
     }
 

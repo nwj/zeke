@@ -8,7 +8,7 @@ use std::path::Path;
 
 pub fn read_dir<P: AsRef<Path>>(path: P) -> impl Iterator<Item = DirEntry> {
     let p = path.as_ref();
-    WalkBuilder::new(&p)
+    WalkBuilder::new(p)
         .hidden(true)
         .parents(true)
         .ignore(true)
@@ -44,7 +44,7 @@ fn is_markdown(entry: &DirEntry) -> bool {
 pub fn read_note<P: AsRef<Path>>(path: P) -> Result<Note> {
     let p = path.as_ref();
 
-    let file_content = std::fs::read_to_string(&p)
+    let file_content = std::fs::read_to_string(p)
         .with_context(|| format!("Failed to read note file `{}`", &p.display()))?;
 
     let (front_matter, content) = Note::from_string(file_content)
@@ -67,7 +67,7 @@ pub fn write_note(note: &Note, create_new: bool) -> Result<()> {
         .write(true)
         .create_new(create_new)
         .truncate(true)
-        .open(&path)
+        .open(path)
         .with_context(|| format!("Failed to open note file `{}`", &path.display()))?;
 
     file.write_all(

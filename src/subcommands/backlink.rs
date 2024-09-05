@@ -5,6 +5,7 @@ use rayon::iter::Either;
 use rayon::prelude::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::path::PathBuf;
 
 pub fn run() -> Result<i32> {
     let (link_map, mut errs): (Vec<_>, Vec<_>) =
@@ -20,15 +21,15 @@ pub fn run() -> Result<i32> {
         eprintln!("{:?}", e);
     }
 
-    let inverse_link_map = link_map
-        .iter()
-        .fold(HashMap::new(), |mut acc, (path, links)| {
-            for l in links {
-                let inverse_links = acc.entry(l).or_insert(HashSet::new());
-                inverse_links.insert(path);
-            }
-            acc
-        });
+    let inverse_link_map: HashMap<&PathBuf, HashSet<&PathBuf>> =
+        link_map
+            .iter()
+            .fold(HashMap::new(), |mut acc, (path, links)| {
+                for l in links {
+                    acc.entry(l).or_default().insert(path);
+                }
+                acc
+            });
 
     errs = inverse_link_map
         .par_iter()
