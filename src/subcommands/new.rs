@@ -4,7 +4,7 @@ use anyhow::{anyhow, Context, Result};
 use std::env;
 use std::process::Command;
 
-pub fn run(title: &str, edit_flag: &bool) -> Result<i32> {
+pub fn run(title: &str, edit_flag: bool) -> Result<i32> {
     let mut note = Note::new();
     note.front_matter.title = title.to_string();
     let path = note.generate_path();
@@ -13,7 +13,7 @@ pub fn run(title: &str, edit_flag: &bool) -> Result<i32> {
     write_note(&note, true)?;
     eprintln!("Created `{}`.", path.to_string_lossy());
 
-    if *edit_flag {
+    if edit_flag {
         get_editor()
             .with_context(|| "Failed to start editor process. Check that either the EDITOR or ZEKE_EDITOR environment variables are set.")?
             .arg(&path)

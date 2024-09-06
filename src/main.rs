@@ -1,3 +1,6 @@
+#![deny(clippy::all)]
+#![deny(clippy::pedantic)]
+
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
@@ -23,7 +26,7 @@ enum Commands {
     New {
         /// Title for the new note
         title: String,
-        /// Open the new note in the editor specified by the EDITOR or ZEKE_EDITOR env variables
+        /// Open the new note in the editor specified by the `EDITOR` or `ZEKE_EDITOR` env variables
         #[arg(long, short)]
         edit: bool,
     },
@@ -79,7 +82,7 @@ fn main() {
     match run() {
         Ok(exit_code) => process::exit(exit_code),
         Err(e) => {
-            eprintln!("{:?}", e);
+            eprintln!("{e:?}");
             process::exit(1)
         }
     }
@@ -89,13 +92,13 @@ fn run() -> Result<i32> {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::New { title, edit } => subcommands::new::run(title, edit),
+        Commands::New { title, edit } => subcommands::new::run(title, *edit),
         Commands::Mv { path, title } => subcommands::mv::run(path, title),
         Commands::Tag { tag, paths } => subcommands::tag::run(tag, paths),
         Commands::Untag { tag, paths } => subcommands::untag::run(tag, paths),
-        Commands::Tags => subcommands::tags::run(),
+        Commands::Tags => Ok(subcommands::tags::run()),
         Commands::Link { path_a, path_b } => subcommands::link::run(path_a, path_b),
         Commands::Unlink { path_a, path_b } => subcommands::unlink::run(path_a, path_b),
-        Commands::Backlink => subcommands::backlink::run(),
+        Commands::Backlink => Ok(subcommands::backlink::run()),
     }
 }

@@ -30,7 +30,7 @@ impl Note {
         let title_part = spaces_replaced.to_lowercase();
         let path_string = match self.front_matter.created {
             Some(ts) => format!("{}-{}.md", ts.format("%Y%m%d"), title_part),
-            None => format!("{}.md", title_part),
+            None => format!("{title_part}.md"),
         };
         PathBuf::from(path_string)
     }
@@ -51,8 +51,8 @@ impl Note {
         let splits: Vec<_> = s.splitn(3, "---").collect();
         match (splits.get(1), splits.get(2)) {
             (Some(fm), Some(c)) => {
-                let front_matter = FrontMatter::from_yaml_string(format!("---{}", fm))?;
-                let content = Content::from(c.trim_start_matches("\n"));
+                let front_matter = FrontMatter::from_yaml_string(&format!("---{fm}"))?;
+                let content = Content::from(c.trim_start_matches('\n'));
                 Ok((front_matter, content))
             }
             _ => Ok((FrontMatter::default(), Content::from(s))),

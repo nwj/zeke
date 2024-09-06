@@ -16,7 +16,7 @@ pub fn read_dir<P: AsRef<Path>>(path: P) -> impl Iterator<Item = DirEntry> {
         .git_global(true)
         .git_exclude(true)
         .build()
-        .filter_map(|r| r.ok())
+        .filter_map(std::result::Result::ok)
         .filter(|en| !is_dir(en) && is_markdown(en))
 }
 

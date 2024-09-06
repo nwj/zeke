@@ -31,13 +31,13 @@ impl FrontMatter {
 
     pub fn to_yaml_string(&self) -> Result<String> {
         let yaml = serde_yaml::to_string(&self)?;
-        Ok(format!("---\n{}---", yaml))
+        Ok(format!("---\n{yaml}---"))
     }
 
-    pub fn from_yaml_string(s: String) -> Result<FrontMatter> {
+    pub fn from_yaml_string(s: &str) -> Result<FrontMatter> {
         let trimmed = s.trim().trim_end().trim_end_matches("---").trim_end();
         let mut front_matter: FrontMatter = serde_yaml::from_str(trimmed)?;
-        front_matter.links = front_matter.links.iter().map(|l| l.clean()).collect();
+        front_matter.links = front_matter.links.iter().map(PathClean::clean).collect();
         Ok(front_matter)
     }
 }
@@ -51,7 +51,7 @@ mod tests {
     #[test]
     fn from_yaml_string_cleans_link_paths() -> Result<()> {
         let yaml = String::from("---\nlinks:\n  - ./bar.md\n  - test/../foo.md\n---\n");
-        let fm1 = FrontMatter::from_yaml_string(yaml)?;
+        let fm1 = FrontMatter::from_yaml_string(&yaml)?;
         let mut fm2 = FrontMatter::new();
         fm2.created = None;
         fm2.links.insert(PathBuf::from("bar.md"));
@@ -92,7 +92,7 @@ mod tests {
     proptest! {
         #[test]
         fn proptest_to_then_from_yaml (fm in arb_front_matter()) {
-            let converted_fm = FrontMatter::from_yaml_string(fm.to_yaml_string().unwrap()).unwrap();
+            let converted_fm = FrontMatter::from_yaml_string(&fm.to_yaml_string().unwrap()).unwrap();
             assert_eq!(fm, converted_fm)
         }
     }

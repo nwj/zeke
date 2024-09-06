@@ -3,7 +3,7 @@ use anyhow::Result;
 use std::path::PathBuf;
 
 pub fn run(tag: &str, paths: &[PathBuf]) -> Result<i32> {
-    for path in paths.iter() {
+    for path in paths {
         let mut note = read_note(path)?;
 
         if note.front_matter.tags.remove(tag) {

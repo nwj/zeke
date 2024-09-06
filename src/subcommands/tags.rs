@@ -1,9 +1,8 @@
 use crate::fs::{read_dir, read_note};
-use anyhow::Result;
 use rayon::iter::Either;
 use rayon::prelude::*;
 
-pub fn run() -> Result<i32> {
+pub fn run() -> i32 {
     let (unflattened_tags, errs): (Vec<_>, Vec<_>) =
         read_dir("./")
             .par_bridge()
@@ -18,12 +17,12 @@ pub fn run() -> Result<i32> {
 
     let err_count = errs.len();
     for e in errs {
-        eprintln!("{:?}", e);
+        eprintln!("{e:?}");
     }
 
     for t in tags {
-        println!("{}", t);
+        println!("{t}");
     }
 
-    Ok(if err_count > 0 { 1 } else { 0 })
+    i32::from(err_count > 0)
 }

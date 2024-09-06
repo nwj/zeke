@@ -62,7 +62,7 @@ pub fn run(path: &PathBuf, title: &str) -> Result<i32> {
 
     let err_count = errs.len();
     for e in errs {
-        eprintln!("{:?}", e);
+        eprintln!("{e:?}");
     }
 
     remove_file(&old_path)
@@ -73,5 +73,5 @@ pub fn run(path: &PathBuf, title: &str) -> Result<i32> {
         old_path.display(),
         new_path.display()
     );
-    Ok(if err_count > 0 { 1 } else { 0 })
+    Ok(i32::from(err_count > 0))
 }

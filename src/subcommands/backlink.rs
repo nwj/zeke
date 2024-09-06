@@ -1,5 +1,4 @@
 use crate::fs::{read_dir, read_note, write_note};
-use anyhow::Result;
 use path_clean::PathClean;
 use rayon::iter::Either;
 use rayon::prelude::*;
@@ -7,7 +6,7 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::path::PathBuf;
 
-pub fn run() -> Result<i32> {
+pub fn run() -> i32 {
     let (link_map, mut errs): (Vec<_>, Vec<_>) =
         read_dir("./")
             .par_bridge()
@@ -18,7 +17,7 @@ pub fn run() -> Result<i32> {
 
     let mut err_count = errs.len();
     for e in errs {
-        eprintln!("{:?}", e);
+        eprintln!("{e:?}");
     }
 
     let inverse_link_map: HashMap<&PathBuf, HashSet<&PathBuf>> =
@@ -55,9 +54,9 @@ pub fn run() -> Result<i32> {
 
     err_count += errs.len();
     for e in errs {
-        eprintln!("{:?}", e);
+        eprintln!("{e:?}");
     }
 
     eprintln!("Backlinking done.");
-    Ok(if err_count > 0 { 1 } else { 0 })
+    i32::from(err_count > 0)
 }
