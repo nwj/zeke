@@ -9,20 +9,20 @@ audit:
 
 # Lints the codebase (via clippy)
 check:
-	cargo clippy
+	cargo clippy --locked
 
 # Formats the codebase (via cargo fmt)
 format:
 	cargo fmt
 
 # Builds and runs
-run:
-	cargo run
+run *args:
+	cargo run --locked {{args}}
 
 # Runs all tests
-test:
-	cargo test
+test *args:
+	cargo test --locked {{args}}
 
 # Lints and tests on every change
 watch:
-	cargo watch -w src -w Cargo.toml -c -x "clippy" -x "test"
+	cargo watch -w src -w Cargo.toml -c -x "clippy --locked" -x "test --locked"
