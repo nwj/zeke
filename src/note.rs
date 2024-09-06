@@ -28,9 +28,10 @@ impl Note {
             .unwrap()
             .replace_all(&punctuation_stripped, "_");
         let title_part = spaces_replaced.to_lowercase();
-        let path_string = match self.front_matter.created {
-            Some(ts) => format!("{}-{}.md", ts.format("%Y%m%d"), title_part),
-            None => format!("{title_part}.md"),
+        let path_string = if let Some(ts) = self.front_matter.created {
+            format!("{}-{}.md", ts.format("%Y%m%d"), title_part)
+        } else {
+            format!("{title_part}.md")
         };
         PathBuf::from(path_string)
     }
