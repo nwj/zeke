@@ -3,7 +3,7 @@ version: 2.1
 parameters:
   rust-version:
     type: string
-    default: "1.80"
+    default: "1.81"
   target-cache-key:
     type: string
     default: "v0-target-{{ arch }}-{{ checksum \"Cargo.lock\" }}"

@@ -1,5 +1,11 @@
 # Unreleased
 
+# v0.7.0
+
+## Features
+
+- **[Breaking Change]** Completely redesigned the CLI interface and rewrote from the ground up. Any compatibility with prior versions is coincidental.
+
 # v0.6.0
 
 ## Features

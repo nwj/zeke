@@ -1,28 +1,12 @@
 [package]
 name = "zeke"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Nick Willett-Jeffries <nwillettjeffries@gmail.com>"]
 edition = "2021"
-description = "Zeke is a CLI for managing a knowledge base built on a local folder of plain text Markdown files."
+description = "A CLI for managing notebooks or knowledge-bases built on a local folder of Markdown files"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.86"
-chrono = { version = "0.4.38", features = ["serde"] }
-clap = { version = "4.5.17", features = ["derive"] }
-ignore = "0.4.22"
-path-clean = "1.0.1"
-pulldown-cmark = { version = "0.9.6", default-features = false, features = ["simd"] }
-pulldown-cmark-to-cmark = "10.0.4"
-rayon = "1.10.0"
-regex = "1.10.6"
-serde = { version = "1.0.209", features = ["derive"] }
-serde_yaml = "0.9.34"
-shell-words = "1.1.0"
 
 [dev-dependencies]
-assert_cmd = "2.0.16"
-assert_fs = "1.1.2"
-predicates = "3.1.2"
-proptest = "1.5.0"

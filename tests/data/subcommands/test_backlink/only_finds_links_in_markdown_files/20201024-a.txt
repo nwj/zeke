@@ -1,7 +1,0 @@
----
-title: A
-created: 2020-10-24T19:59:57.809006Z
-tags: []
-links: []
----
-This is a reference to [B](20201024-b.md).
