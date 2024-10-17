@@ -1,5 +1,6 @@
 mod common;
 use common::zeke;
+use predicates::prelude::*;
 
 #[test]
 fn displays_help() {
@@ -33,4 +34,88 @@ fn displays_version() {
         .assert()
         .success()
         .stdout(version_text);
+}
+
+#[test]
+fn new_subcommand_displays_help() {
+    let help_text = "Create new notes
+
+Usage: zeke new [OPTIONS]
+
+Options:
+  -d, --debug    Run with debugging output
+  -h, --help     Print help
+  -V, --version  Print version\n";
+
+    zeke()
+        .arg("new")
+        .arg("--help")
+        .assert()
+        .success()
+        .stdout(help_text);
+}
+
+#[test]
+fn new_subcommand_not_implemented() {
+    zeke()
+        .arg("new")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("not yet implemented"));
+}
+
+#[test]
+fn ls_subcommand_displays_help() {
+    let help_text = "List and filter notes
+
+Usage: zeke ls [OPTIONS]
+
+Options:
+  -d, --debug    Run with debugging output
+  -h, --help     Print help
+  -V, --version  Print version\n";
+
+    zeke()
+        .arg("ls")
+        .arg("--help")
+        .assert()
+        .success()
+        .stdout(help_text);
+}
+
+#[test]
+fn ls_subcommand_not_implemented() {
+    zeke()
+        .arg("ls")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("not yet implemented"));
+}
+
+#[test]
+fn config_subcommand_displays_help() {
+    let help_text = "Print configuration information
+
+Usage: zeke config [OPTIONS]
+
+Options:
+  -d, --debug    Run with debugging output
+  -h, --help     Print help
+  -V, --version  Print version\n";
+
+    zeke()
+        .arg("config")
+        .arg("--help")
+        .assert()
+        .success()
+        .stdout(help_text);
+}
+
+#[test]
+fn config_subcommand_not_implemented() {
+    zeke()
+        .arg("config")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("not yet implemented"));
 }

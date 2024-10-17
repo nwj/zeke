@@ -16,7 +16,12 @@ fn main() {
 }
 
 fn run() -> Result<()> {
-    let _cli_arguments = cli::get_cli_arguments();
+    let cli_arguments = cli::get_cli_arguments();
 
-    Ok(())
+    match cli_arguments.subcommand() {
+        Some(("new", _subcommand_args)) => todo!("new subcommand not yet implemented"),
+        Some(("ls", _subcommand_args)) => todo!("ls subcommand not yet implemented"),
+        Some(("config", _subcommand_args)) => todo!("config subcommand not yet implemented"),
+        _ => unreachable!("clap's subcommand_required option prevents this state"),
+    }
 }
