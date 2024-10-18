@@ -99,9 +99,10 @@ fn config_subcommand_displays_help() {
 Usage: zeke config [OPTIONS]
 
 Options:
-  -d, --debug    Run with debugging output
-  -h, --help     Print help
-  -V, --version  Print version\n";
+  -d, --debug         Run with debugging output
+      --show-sources  Show the source of each configuration setting
+  -h, --help          Print help
+  -V, --version       Print version\n";
 
     zeke()
         .arg("config")
@@ -112,10 +113,21 @@ Options:
 }
 
 #[test]
-fn config_subcommand_not_implemented() {
+fn config_displays_the_configuration() {
     zeke()
         .arg("config")
         .assert()
-        .failure()
-        .stderr(predicate::str::contains("not yet implemented"));
+        .success()
+        .stdout("debug = false\n");
+}
+
+#[test]
+fn config_can_display_the_configuration_with_sources() {
+    zeke()
+        .arg("config")
+        .arg("--show-sources")
+        .arg("--debug")
+        .assert()
+        .success()
+        .stdout("debug = true (via argument)\n");
 }

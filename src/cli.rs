@@ -19,7 +19,16 @@ pub fn get_cli_arguments() -> ArgMatches {
         )
         .subcommand(Command::new("new").about("Create new notes"))
         .subcommand(Command::new("ls").about("List and filter notes"))
-        .subcommand(Command::new("config").about("Print configuration information"));
+        .subcommand(
+            Command::new("config")
+                .about("Print configuration information")
+                .arg(
+                    Arg::new("show-sources")
+                        .long("show-sources")
+                        .action(ArgAction::SetTrue)
+                        .help("Show the source of each configuration setting"),
+                ),
+        );
 
     cli_command.get_matches()
 }

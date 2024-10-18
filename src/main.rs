@@ -4,6 +4,8 @@
 use anyhow::Result;
 
 mod cli;
+mod config;
+mod subcommands;
 
 fn main() {
     match run() {
@@ -16,12 +18,13 @@ fn main() {
 }
 
 fn run() -> Result<()> {
-    let cli_arguments = cli::get_cli_arguments();
+    let args = cli::get_cli_arguments();
+    let config = config::get_configuration(&args);
 
-    match cli_arguments.subcommand() {
+    match args.subcommand() {
         Some(("new", _subcommand_args)) => todo!("new subcommand not yet implemented"),
         Some(("ls", _subcommand_args)) => todo!("ls subcommand not yet implemented"),
-        Some(("config", _subcommand_args)) => todo!("config subcommand not yet implemented"),
+        Some(("config", subcommand_args)) => subcommands::config::run(subcommand_args, &config),
         _ => unreachable!("clap's subcommand_required option prevents this state"),
     }
 }
