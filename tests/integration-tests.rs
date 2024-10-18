@@ -99,10 +99,11 @@ fn config_subcommand_displays_help() {
 Usage: zeke config [OPTIONS]
 
 Options:
-  -d, --debug         Run with debugging output
-      --show-sources  Show the source of each configuration setting
-  -h, --help          Print help
-  -V, --version       Print version\n";
+  -d, --debug          Run with debugging output
+      --show-sources   Show the source of each configuration setting
+      --show-defaults  Show the system default configuration settings
+  -h, --help           Print help
+  -V, --version        Print version\n";
 
     zeke()
         .arg("config")
@@ -130,4 +131,14 @@ fn config_can_display_the_configuration_with_sources() {
         .assert()
         .success()
         .stdout("debug = true (via argument)\n");
+}
+
+#[test]
+fn config_can_display_the_configuration_defaults() {
+    zeke()
+        .arg("config")
+        .arg("--show-defaults")
+        .assert()
+        .success()
+        .stdout("debug = false\n");
 }

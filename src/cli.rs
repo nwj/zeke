@@ -27,6 +27,12 @@ pub fn get_cli_arguments() -> ArgMatches {
                         .long("show-sources")
                         .action(ArgAction::SetTrue)
                         .help("Show the source of each configuration setting"),
+                )
+                .arg(
+                    Arg::new("show-defaults")
+                        .long("show-defaults")
+                        .action(ArgAction::SetTrue)
+                        .help("Show the system default configuration settings"),
                 ),
         );
 

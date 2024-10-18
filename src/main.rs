@@ -24,7 +24,7 @@ fn run() -> Result<()> {
     match args.subcommand() {
         Some(("new", _subcommand_args)) => todo!("new subcommand not yet implemented"),
         Some(("ls", _subcommand_args)) => todo!("ls subcommand not yet implemented"),
-        Some(("config", subcommand_args)) => subcommands::config::run(subcommand_args, &config),
+        Some(("config", subcommand_args)) => subcommands::config::run(subcommand_args, config),
         _ => unreachable!("clap's subcommand_required option prevents this state"),
     }
 }
