@@ -1,5 +1,6 @@
 #![deny(clippy::all)]
 #![deny(clippy::pedantic)]
+#![allow(clippy::module_name_repetitions)]
 
 use anyhow::Result;
 
@@ -17,6 +18,7 @@ fn main() {
     }
 }
 
+#[allow(clippy::unnecessary_wraps)]
 fn run() -> Result<()> {
     let args = cli::get_cli_arguments();
     let config = config::get_configuration(&args);

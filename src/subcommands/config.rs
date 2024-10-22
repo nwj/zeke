@@ -1,10 +1,11 @@
-use crate::config::Config;
+use crate::config;
 use anyhow::Result;
 use clap::ArgMatches;
 
-pub fn run(args: &ArgMatches, config: Config) -> Result<()> {
+#[allow(clippy::unnecessary_wraps)]
+pub fn run(args: &ArgMatches, config: config::Config) -> Result<()> {
     let config = if args.get_flag("show-defaults") {
-        Config::default()
+        config::get_default_configuration()
     } else {
         config
     };

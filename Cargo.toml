@@ -10,7 +10,9 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.89"
 clap = { version = "4.5.20", features = ["cargo"] }
+toml = "0.8.19"
 
 [dev-dependencies]
 assert_cmd = "2.0.16"
-predicates = { version = "3.1.2", default-features = false, features = ["color", "diff", "normalize-line-endings"] }
+assert_fs = "1.1.2"
+predicates = "3.1.2"

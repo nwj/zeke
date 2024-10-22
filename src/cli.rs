@@ -17,6 +17,13 @@ pub fn get_cli_arguments() -> ArgMatches {
                 .help("Run with debugging output")
                 .global(true),
         )
+        .arg(
+            Arg::new("test")
+                .long("test")
+                .action(ArgAction::SetTrue)
+                .help("Test configuration argument")
+                .global(true),
+        )
         .subcommand(Command::new("new").about("Create new notes"))
         .subcommand(Command::new("ls").about("List and filter notes"))
         .subcommand(
