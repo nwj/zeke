@@ -65,30 +65,69 @@ impl ConfigBuilder {
         Self { test: None }
     }
 
-    fn load_defaults(mut self) -> Self {
-        self.test = Some(ConfigValue::new(false, Source::Default));
-        self
-    }
-
     fn load_file(mut self, path: PathBuf) -> Self {
-        if let Ok(contents) = fs::read_to_string(&path) {
-            if let Ok(toml) = contents.parse::<toml::Table>() {
-                if let Some(test) = toml.get("test").and_then(toml::Value::as_bool) {
-                    self.test = Some(ConfigValue::new(test, Source::File(path)));
-                }
+        let content = match fs::read_to_string(&path) {
+            Ok(c) => c,
+            Err(e) => {
+                log::warn!(
+                    "Failed to read config file at: {}. Reason: {e}",
+                    path.display()
+                );
+                return self;
+            }
+        };
+
+        let parsed_content = match content.parse::<toml::Table>() {
+            Ok(pc) => pc,
+            Err(e) => {
+                log::warn!(
+                    "Failed to parse config file at: {}. Reason: {e}",
+                    path.display()
+                );
+                return self;
+            }
+        };
+
+        match parsed_content.get("test").and_then(toml::Value::as_bool) {
+            Some(test) => self.test = Some(ConfigValue::new(test, Source::File(path))),
+            None => {
+                log::info!(
+                    "Did not find boolean field 'test' in config file at: {}.",
+                    path.display()
+                );
             }
         }
+
         self
     }
 
     fn get_config_file_path() -> Option<PathBuf> {
-        if let Ok(p) = env::var("XDG_CONFIG_HOME") {
-            Some(PathBuf::from(format!("{p}/zeke/config.toml")))
-        } else if let Ok(p) = env::var("HOME") {
-            Some(PathBuf::from(format!("{p}/zeke/config.toml")))
-        } else {
-            None
+        match env::var("XDG_CONFIG_HOME") {
+            Ok(v) => {
+                let path = PathBuf::from(format!("{v}/zeke/config.toml"));
+                log::info!(
+                    "$XDG_CONFIG_HOME is set. Will look for config file at: {}",
+                    path.display()
+                );
+                return Some(path);
+            }
+            Err(e) => log::info!("Could not read $XDG_CONFIG_HOME. Reason: {e}"),
         }
+
+        match env::var("HOME") {
+            Ok(v) => {
+                let path = PathBuf::from(format!("{v}/zeke/config.toml"));
+                log::info!(
+                    "$HOME is set. Will look for config file at: {}",
+                    path.display()
+                );
+                return Some(path);
+            }
+            Err(e) => log::info!("Could not read $HOME. Reason: {e}"),
+        }
+
+        log::warn!("Failed to get a config file path");
+        None
     }
 
     fn load_config_file(mut self) -> Self {
@@ -122,14 +161,14 @@ impl ConfigBuilder {
         Config {
             test: self
                 .test
-                .expect("missing 'test' ConfigValue while attempting to build Config"),
+                .unwrap_or(ConfigValue::new(false, Source::Default)),
         }
     }
 }
 
 pub fn get_configuration(args: &ArgMatches) -> Config {
+    log::info!("Getting configuration");
     ConfigBuilder::new()
-        .load_defaults()
         .load_config_file()
         .load_env_vars()
         .load_args(args)
@@ -137,5 +176,6 @@ pub fn get_configuration(args: &ArgMatches) -> Config {
 }
 
 pub fn get_default_configuration() -> Config {
-    ConfigBuilder::new().load_defaults().build()
+    log::info!("Getting default configuration");
+    ConfigBuilder::new().build()
 }

@@ -52,6 +52,17 @@ fn displays_version() {
 }
 
 #[test]
+fn debug_flag_enables_logging() {
+    let ctx = TestContext::new();
+    ctx.command()
+        .arg("--debug")
+        .arg("config")
+        .assert()
+        .success()
+        .stderr(predicate::str::contains("Debug logging enabled"));
+}
+
+#[test]
 fn new_subcommand_displays_help() {
     let ctx = TestContext::new();
     let help_text = "Create new notes
