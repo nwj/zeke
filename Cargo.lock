@@ -701,6 +701,7 @@ dependencies = [
  "assert_fs",
  "clap",
  "env_logger",
+ "indexmap",
  "log",
  "predicates",
  "toml",

@@ -26,7 +26,7 @@ fn run() -> Result<()> {
         env_logger::Builder::new()
             .filter_level(log::LevelFilter::max())
             .init();
-        log::info!("Debug logging enabled");
+        log::debug!("Debug logging enabled");
     } else {
         env_logger::Builder::new()
             .filter_level(log::LevelFilter::Off)
@@ -35,7 +35,7 @@ fn run() -> Result<()> {
 
     let config = config::get_configuration(&args);
 
-    log::info!("Routing based on subcommand");
+    log::debug!("Routing based on subcommand");
     match args.subcommand() {
         Some(("new", _subcommand_args)) => todo!("new subcommand not yet implemented"),
         Some(("ls", _subcommand_args)) => todo!("ls subcommand not yet implemented"),

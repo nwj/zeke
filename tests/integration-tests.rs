@@ -193,9 +193,10 @@ fn config_can_display_the_configuration_defaults_with_sources() {
 }
 
 #[test]
-fn config_priority_is_args_then_env_vars_then_config_file_then_defaults() {
+fn config_priority_is_args_then_env_vars_then_notebook_config_then_user_config_then_defaults() {
     let ctx = TestContext::new();
-    let config_file = ctx.create_config_file("test = true\n");
+    let user_level_config_file = ctx.create_user_level_config_file("test = true\n");
+    let notebook_level_config_file = ctx.create_notebook_level_config_file("test = true\n");
     ctx.command()
         .arg("config")
         .arg("--show-sources")
@@ -218,9 +219,19 @@ fn config_priority_is_args_then_env_vars_then_config_file_then_defaults() {
         .success()
         .stdout(format!(
             "test = true # via file: {}\n",
-            config_file.display()
+            notebook_level_config_file.canonicalize().unwrap().display()
         ));
-    std::fs::remove_file(config_file.path()).unwrap();
+    std::fs::remove_file(notebook_level_config_file.path()).unwrap();
+    ctx.command()
+        .arg("config")
+        .arg("--show-sources")
+        .assert()
+        .success()
+        .stdout(format!(
+            "test = true # via file: {}\n",
+            user_level_config_file.canonicalize().unwrap().display()
+        ));
+    std::fs::remove_file(user_level_config_file.path()).unwrap();
     ctx.command()
         .arg("config")
         .arg("--show-sources")

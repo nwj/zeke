@@ -1,4 +1,5 @@
 use clap::ArgMatches;
+use indexmap::IndexSet;
 use std::{env, fmt, fs, path::PathBuf};
 
 pub enum Source {
@@ -101,37 +102,89 @@ impl ConfigBuilder {
         self
     }
 
-    fn get_config_file_path() -> Option<PathBuf> {
-        match env::var("XDG_CONFIG_HOME") {
-            Ok(v) => {
-                let path = PathBuf::from(format!("{v}/zeke/config.toml"));
-                log::info!(
-                    "$XDG_CONFIG_HOME is set. Will look for config file at: {}",
-                    path.display()
-                );
-                return Some(path);
-            }
-            Err(e) => log::info!("Could not read $XDG_CONFIG_HOME. Reason: {e}"),
+    fn get_user_level_config_file_path() -> Option<PathBuf> {
+        let possible_paths: IndexSet<PathBuf> = vec![
+            env::var("XDG_CONFIG_HOME").ok().and_then(|v| {
+                Some(
+                    PathBuf::from(v)
+                        .canonicalize()
+                        .ok()?
+                        .join("zeke")
+                        .join("config.toml"),
+                )
+            }),
+            env::var("XDG_CONFIG_HOME").ok().and_then(|v| {
+                Some(
+                    PathBuf::from(v)
+                        .canonicalize()
+                        .ok()?
+                        .join("zeke")
+                        .join("config.toml"),
+                )
+            }),
+        ]
+        .into_iter()
+        .flatten()
+        .collect();
+
+        let found_path = possible_paths
+            .into_iter()
+            .inspect(|path| {
+                log::debug!("Checking for user-level config file at: {}", path.display());
+            })
+            .find(|path| path.is_file());
+
+        if let Some(ref path) = found_path {
+            log::info!("Found a user-level config file at: {}", path.display());
+        } else {
+            log::info!("Did not find a user-level config file");
         }
 
-        match env::var("HOME") {
-            Ok(v) => {
-                let path = PathBuf::from(format!("{v}/zeke/config.toml"));
-                log::info!(
-                    "$HOME is set. Will look for config file at: {}",
-                    path.display()
-                );
-                return Some(path);
-            }
-            Err(e) => log::info!("Could not read $HOME. Reason: {e}"),
-        }
-
-        log::warn!("Failed to get a config file path");
-        None
+        found_path
     }
 
-    fn load_config_file(mut self) -> Self {
-        let path = Self::get_config_file_path();
+    fn load_user_level_config_file(mut self) -> Self {
+        let path = Self::get_user_level_config_file_path();
+        if let Some(path) = path {
+            self = self.load_file(path);
+        }
+        self
+    }
+
+    fn get_notebook_level_config_file_path() -> Option<PathBuf> {
+        const MAX_SEARCH_DEPTH: usize = 25;
+
+        let start_dir = std::env::current_dir().ok()?;
+
+        let possible_paths: IndexSet<PathBuf> =
+            std::iter::successors(Some(start_dir.canonicalize().ok()?), |dir| {
+                dir.parent().map(std::path::Path::to_path_buf)
+            })
+            .take(MAX_SEARCH_DEPTH)
+            .map(|dir| dir.join(".zeke").join("config.toml"))
+            .collect();
+
+        let found_path = possible_paths
+            .into_iter()
+            .inspect(|path| {
+                log::debug!(
+                    "Checking for a notebook-level config file at: {}",
+                    path.display()
+                );
+            })
+            .find(|path| path.is_file());
+
+        if let Some(ref path) = found_path {
+            log::info!("Found a notebook-level config file at: {}", path.display());
+        } else {
+            log::info!("Did not find a notebook-level config file");
+        }
+
+        found_path
+    }
+
+    fn load_notebook_level_config_file(mut self) -> Self {
+        let path = Self::get_notebook_level_config_file_path();
         if let Some(path) = path {
             self = self.load_file(path);
         }
@@ -167,15 +220,16 @@ impl ConfigBuilder {
 }
 
 pub fn get_configuration(args: &ArgMatches) -> Config {
-    log::info!("Getting configuration");
+    log::debug!("Getting configuration");
     ConfigBuilder::new()
-        .load_config_file()
+        .load_user_level_config_file()
+        .load_notebook_level_config_file()
         .load_env_vars()
         .load_args(args)
         .build()
 }
 
 pub fn get_default_configuration() -> Config {
-    log::info!("Getting default configuration");
+    log::debug!("Getting default configuration");
     ConfigBuilder::new().build()
 }

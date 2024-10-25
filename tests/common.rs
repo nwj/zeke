@@ -6,27 +6,31 @@ use std::process::Command;
 pub struct TestContext {
     _temp_dir: TempDir,
     home_dir: ChildPath,
-    notebook_dir: ChildPath,
     xdg_config_dir: ChildPath,
-    zeke_config_dir: ChildPath,
+    user_level_config_dir: ChildPath,
+    notebook_dir: ChildPath,
+    notebook_level_config_dir: ChildPath,
 }
 
 impl TestContext {
     pub fn new() -> Self {
         let temp_dir = TempDir::new().unwrap();
         let home_dir = temp_dir.child("home");
-        let notebook_dir = home_dir.child("notes");
         let xdg_config_dir = home_dir.child(".config");
-        let zeke_config_dir = xdg_config_dir.child("zeke");
-        notebook_dir.create_dir_all().unwrap();
-        zeke_config_dir.create_dir_all().unwrap();
+        let user_level_config_dir = xdg_config_dir.child("zeke");
+        let notebook_dir = home_dir.child("notes");
+        let notebook_level_config_dir = notebook_dir.child(".zeke");
+
+        user_level_config_dir.create_dir_all().unwrap();
+        notebook_level_config_dir.create_dir_all().unwrap();
 
         Self {
             _temp_dir: temp_dir,
             home_dir,
-            notebook_dir,
             xdg_config_dir,
-            zeke_config_dir,
+            user_level_config_dir,
+            notebook_dir,
+            notebook_level_config_dir,
         }
     }
 
@@ -40,8 +44,14 @@ impl TestContext {
         cmd
     }
 
-    pub fn create_config_file(&self, content: &str) -> assert_fs::fixture::ChildPath {
-        let config_file = self.zeke_config_dir.child("config.toml");
+    pub fn create_user_level_config_file(&self, content: &str) -> ChildPath {
+        let config_file = self.user_level_config_dir.child("config.toml");
+        config_file.write_str(content).unwrap();
+        config_file
+    }
+
+    pub fn create_notebook_level_config_file(&self, content: &str) -> ChildPath {
+        let config_file = self.notebook_level_config_dir.child("config.toml");
         config_file.write_str(content).unwrap();
         config_file
     }
