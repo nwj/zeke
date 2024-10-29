@@ -18,10 +18,10 @@ pub fn get_cli_arguments() -> ArgMatches {
                 .global(true),
         )
         .arg(
-            Arg::new("test")
-                .long("test")
-                .action(ArgAction::SetTrue)
-                .help("Test configuration argument")
+            Arg::new("editor")
+                .long("editor")
+                .action(ArgAction::Set)
+                .help("Specify an editor to open notes in")
                 .global(true),
         )
         .subcommand(Command::new("new").about("Create new notes"))

@@ -16,10 +16,10 @@ Commands:
   help    Print this message or the help of the given subcommand(s)
 
 Options:
-  -d, --debug    Run with debugging output
-      --test     Test configuration argument
-  -h, --help     Print help
-  -V, --version  Print version\n";
+  -d, --debug            Run with debugging output
+      --editor <editor>  Specify an editor to open notes in
+  -h, --help             Print help
+  -V, --version          Print version\n";
 
     ctx.command().assert().failure().stderr(help_text);
     ctx.command()
@@ -70,10 +70,10 @@ fn new_subcommand_displays_help() {
 Usage: zeke new [OPTIONS]
 
 Options:
-  -d, --debug    Run with debugging output
-      --test     Test configuration argument
-  -h, --help     Print help
-  -V, --version  Print version\n";
+  -d, --debug            Run with debugging output
+      --editor <editor>  Specify an editor to open notes in
+  -h, --help             Print help
+  -V, --version          Print version\n";
 
     ctx.command()
         .arg("new")
@@ -101,10 +101,10 @@ fn ls_subcommand_displays_help() {
 Usage: zeke ls [OPTIONS]
 
 Options:
-  -d, --debug    Run with debugging output
-      --test     Test configuration argument
-  -h, --help     Print help
-  -V, --version  Print version\n";
+  -d, --debug            Run with debugging output
+      --editor <editor>  Specify an editor to open notes in
+  -h, --help             Print help
+  -V, --version          Print version\n";
 
     ctx.command()
         .arg("ls")
@@ -132,12 +132,12 @@ fn config_subcommand_displays_help() {
 Usage: zeke config [OPTIONS]
 
 Options:
-  -d, --debug          Run with debugging output
-      --show-sources   Show the source of each configuration setting
-      --show-defaults  Show the system default configuration settings
-      --test           Test configuration argument
-  -h, --help           Print help
-  -V, --version        Print version\n";
+  -d, --debug            Run with debugging output
+      --show-sources     Show the source of each configuration setting
+      --editor <editor>  Specify an editor to open notes in
+      --show-defaults    Show the system default configuration settings
+  -h, --help             Print help
+  -V, --version          Print version\n";
 
     ctx.command()
         .arg("config")
@@ -154,7 +154,7 @@ fn config_displays_the_configuration() {
         .arg("config")
         .assert()
         .success()
-        .stdout("test = false\n");
+        .stdout("editor = \"nano\"\n\n");
 }
 
 #[test]
@@ -163,10 +163,11 @@ fn config_can_display_the_configuration_with_sources() {
     ctx.command()
         .arg("config")
         .arg("--show-sources")
-        .arg("--test")
+        .arg("--editor")
+        .arg("vim")
         .assert()
         .success()
-        .stdout("test = true # via argument: --test\n");
+        .stdout("editor = \"vim\" # via argument: --editor\n\n");
 }
 
 #[test]
@@ -177,7 +178,7 @@ fn config_can_display_the_configuration_defaults() {
         .arg("--show-defaults")
         .assert()
         .success()
-        .stdout("test = false\n");
+        .stdout("editor = \"nano\"\n\n");
 }
 
 #[test]
@@ -189,36 +190,37 @@ fn config_can_display_the_configuration_defaults_with_sources() {
         .arg("--show-sources")
         .assert()
         .success()
-        .stdout("test = false # via default\n");
+        .stdout("editor = \"nano\" # via default\n\n");
 }
 
 #[test]
 fn config_priority_is_args_then_env_vars_then_notebook_config_then_user_config_then_defaults() {
     let ctx = TestContext::new();
-    let user_level_config_file = ctx.create_user_level_config_file("test = true\n");
-    let notebook_level_config_file = ctx.create_notebook_level_config_file("test = true\n");
+    let user_level_config_file = ctx.create_user_level_config_file("editor = \"hx\"\n");
+    let notebook_level_config_file = ctx.create_notebook_level_config_file("editor = \"emacs\"\n");
     ctx.command()
         .arg("config")
         .arg("--show-sources")
-        .arg("--test")
-        .env("ZEKE_TEST", "true")
+        .arg("--editor")
+        .arg("vim")
+        .env("ZEKE_EDITOR", "nvim")
         .assert()
         .success()
-        .stdout("test = true # via argument: --test\n");
+        .stdout("editor = \"vim\" # via argument: --editor\n\n");
     ctx.command()
         .arg("config")
         .arg("--show-sources")
-        .env("ZEKE_TEST", "true")
+        .env("ZEKE_EDITOR", "nvim")
         .assert()
         .success()
-        .stdout("test = true # via environment variable: ZEKE_TEST\n");
+        .stdout("editor = \"nvim\" # via environment variable: ZEKE_EDITOR\n\n");
     ctx.command()
         .arg("config")
         .arg("--show-sources")
         .assert()
         .success()
         .stdout(format!(
-            "test = true # via file: {}\n",
+            "editor = \"emacs\" # via file: {}\n\n",
             notebook_level_config_file.canonicalize().unwrap().display()
         ));
     std::fs::remove_file(notebook_level_config_file.path()).unwrap();
@@ -228,7 +230,7 @@ fn config_priority_is_args_then_env_vars_then_notebook_config_then_user_config_t
         .assert()
         .success()
         .stdout(format!(
-            "test = true # via file: {}\n",
+            "editor = \"hx\" # via file: {}\n\n",
             user_level_config_file.canonicalize().unwrap().display()
         ));
     std::fs::remove_file(user_level_config_file.path()).unwrap();
@@ -237,5 +239,5 @@ fn config_priority_is_args_then_env_vars_then_notebook_config_then_user_config_t
         .arg("--show-sources")
         .assert()
         .success()
-        .stdout("test = false # via default\n");
+        .stdout("editor = \"nano\" # via default\n\n");
 }

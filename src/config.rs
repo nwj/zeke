@@ -41,33 +41,41 @@ impl<T> ConfigValue<T> {
 }
 
 pub struct Config {
-    pub test: ConfigValue<bool>,
+    pub editor: ConfigValue<String>,
 }
 
 impl fmt::Display for Config {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "test = {}", self.test.value())?;
+        writeln!(f, "editor = \"{}\"", self.editor.value())?;
         Ok(())
     }
 }
 
 impl Config {
     pub fn format_with_sources(&self) -> String {
-        format!("test = {} # via {}", self.test.value(), self.test.source())
+        let mut output = Vec::with_capacity(2);
+
+        output.push(format!(
+            "editor = \"{}\" # via {}",
+            self.editor.value(),
+            self.editor.source()
+        ));
+
+        output.join("\n") + "\n"
     }
 }
 
 struct ConfigBuilder {
-    test: Option<ConfigValue<bool>>,
+    editor: Option<ConfigValue<String>>,
 }
 
 impl ConfigBuilder {
     fn new() -> Self {
-        Self { test: None }
+        Self { editor: None }
     }
 
-    fn load_file(mut self, path: PathBuf) -> Self {
-        let content = match fs::read_to_string(&path) {
+    fn load_file(mut self, path: &PathBuf) -> Self {
+        let content = match fs::read_to_string(path) {
             Ok(c) => c,
             Err(e) => {
                 log::warn!(
@@ -89,11 +97,13 @@ impl ConfigBuilder {
             }
         };
 
-        match parsed_content.get("test").and_then(toml::Value::as_bool) {
-            Some(test) => self.test = Some(ConfigValue::new(test, Source::File(path))),
+        match parsed_content.get("editor").and_then(toml::Value::as_str) {
+            Some(val) => {
+                self.editor = Some(ConfigValue::new(val.into(), Source::File(path.clone())));
+            }
             None => {
                 log::info!(
-                    "Did not find boolean field 'test' in config file at: {}.",
+                    "Did not find string field 'editor' in config file at: {}.",
                     path.display()
                 );
             }
@@ -146,7 +156,7 @@ impl ConfigBuilder {
     fn load_user_level_config_file(mut self) -> Self {
         let path = Self::get_user_level_config_file_path();
         if let Some(path) = path {
-            self = self.load_file(path);
+            self = self.load_file(&path);
         }
         self
     }
@@ -186,35 +196,30 @@ impl ConfigBuilder {
     fn load_notebook_level_config_file(mut self) -> Self {
         let path = Self::get_notebook_level_config_file_path();
         if let Some(path) = path {
-            self = self.load_file(path);
+            self = self.load_file(&path);
         }
         self
     }
 
     fn load_env_vars(mut self) -> Self {
-        if let Ok(unparsed_val) = env::var("ZEKE_TEST") {
-            if let Ok(parsed_val) = unparsed_val.parse::<bool>() {
-                self.test = Some(ConfigValue::new(
-                    parsed_val,
-                    Source::EnvVar("ZEKE_TEST".into()),
-                ));
-            }
+        if let Ok(val) = env::var("ZEKE_EDITOR") {
+            self.editor = Some(ConfigValue::new(val, Source::EnvVar("ZEKE_EDITOR".into())));
         }
         self
     }
 
     fn load_args(mut self, args: &ArgMatches) -> Self {
-        if args.get_flag("test") {
-            self.test = Some(ConfigValue::new(true, Source::Arg("test".into())));
+        if let Ok(Some(val)) = args.try_get_one::<String>("editor") {
+            self.editor = Some(ConfigValue::new(val.into(), Source::Arg("editor".into())));
         }
         self
     }
 
     fn build(self) -> Config {
         Config {
-            test: self
-                .test
-                .unwrap_or(ConfigValue::new(false, Source::Default)),
+            editor: self
+                .editor
+                .unwrap_or(ConfigValue::new("nano".into(), Source::Default)),
         }
     }
 }
