@@ -25,4 +25,4 @@ test *args:
 
 # Lints and tests on every change
 watch:
-	cargo watch -w src -w Cargo.toml -c -x "clippy --locked" -x "test --locked"
+	cargo watch -w src -w tests -w Cargo.toml -c -x "clippy --locked" -x "test --locked"
