@@ -5,11 +5,11 @@ use std::process::Command;
 
 pub struct TestContext {
     _temp_dir: TempDir,
-    home_dir: ChildPath,
-    xdg_config_dir: ChildPath,
-    user_level_config_dir: ChildPath,
-    notebook_dir: ChildPath,
-    notebook_level_config_dir: ChildPath,
+    pub home_dir: ChildPath,
+    pub xdg_config_dir: ChildPath,
+    pub user_level_config_dir: ChildPath,
+    pub notebook_dir: ChildPath,
+    pub notebook_level_config_dir: ChildPath,
 }
 
 impl TestContext {

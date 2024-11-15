@@ -1,4 +1,5 @@
 mod common;
+use assert_fs::prelude::*;
 use common::TestContext;
 use predicates::prelude::*;
 
@@ -84,13 +85,27 @@ Options:
 }
 
 #[test]
-fn new_subcommand_not_implemented() {
+fn new_subcommand_creates_a_new_note_file() {
     let ctx = TestContext::new();
+    ctx.command().arg("new").assert().success();
+    ctx.notebook_dir.child("note.md").assert("");
+}
+
+#[test]
+fn new_subcommand_doesnt_overwrite_an_already_existing_file() {
+    let ctx = TestContext::new();
+    ctx.notebook_dir
+        .child("note.md")
+        .write_str("Previously extant content")
+        .unwrap();
     ctx.command()
         .arg("new")
         .assert()
         .failure()
-        .stderr(predicate::str::contains("not yet implemented"));
+        .stderr(predicate::str::contains("Failed to create new note"));
+    ctx.notebook_dir
+        .child("note.md")
+        .assert("Previously extant content");
 }
 
 #[test]

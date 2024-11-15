@@ -37,7 +37,7 @@ fn run() -> Result<()> {
 
     log::debug!("Routing based on subcommand");
     match args.subcommand() {
-        Some(("new", _subcommand_args)) => todo!("new subcommand not yet implemented"),
+        Some(("new", subcommand_args)) => subcommands::new::run(subcommand_args, &config),
         Some(("ls", _subcommand_args)) => todo!("ls subcommand not yet implemented"),
         Some(("config", subcommand_args)) => subcommands::config::run(subcommand_args, config),
         _ => unreachable!("the clap::Command::subcommand_required option prevents this state"),
