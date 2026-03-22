@@ -68,7 +68,7 @@ impl Content {
             .collect()
     }
 
-    fn markdown_parser(&self) -> MarkdownParser {
+    fn markdown_parser(&self) -> MarkdownParser<'_, '_> {
         MarkdownParser::new(&self.0)
     }
 

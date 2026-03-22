@@ -53,7 +53,7 @@ pub fn run(path: &PathBuf, title: &str) -> Result<i32> {
                     )
                 }) {
                     return Some(e);
-                };
+                }
             }
 
             None

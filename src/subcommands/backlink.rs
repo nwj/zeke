@@ -45,7 +45,7 @@ pub fn run() -> i32 {
             if insert_results.iter().any(|&b| b) {
                 if let Err(e) = write_note(&linked_note, false) {
                     return Some(e);
-                };
+                }
             }
 
             None
